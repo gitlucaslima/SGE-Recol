@@ -55,8 +55,8 @@
                             </a>
                             <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                                 <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" href="layout-static.html"><i class="fa-solid fa-circle-plus"></i>Novo Emprestimo</a>
-                                    <a class="nav-link" href="layout-sidenav-light.html"><i class="fa-solid fa-circle-xmark"></i>Fechar Emprestimo</a>
+                                    <a class="nav-link" href="{% url 'novoEmprestimo' %}"><i class="fa-solid fa-circle-plus"></i>Novo Emprestimo</a>
+                                    <a class="nav-link" href="{% url 'encerrarEmprestimo' %}"><i class="fa-solid fa-circle-xmark"></i>Fechar Emprestimo</a>
                                 </nav>
                             </div>
                             <a class="nav-link" href="{% url 'colaborador' %}">
@@ -81,39 +81,79 @@
 
                         {% block conteudo %}
                         <div class="row">
-                            <div class="col-xl-3 col-md-6 ">
-                                <div class="card bg-primary text-white mb-4">
-                                    <div class="card-body d-flex align-items-center justify-content-center">Emprestimos em aberto</div>
-                                    <div class="card-footer d-flex align-items-center justify-content-center">
-                                        <span class="text-white stretched-link">10</span>
+
+                            <!-- Emprestimos Fechados-->
+                            <div class="col-xl-3 col-md-6 mb-4">
+                                <div class="card border-left-primary shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                    Emprestimos Encerrados</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">30</div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fa-solid fa-check fa-2x text-gray-300"></i>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-xl-3 col-md-6">
-                                <div class="card bg-warning text-white mb-4">
-                                    <div class="card-body d-flex align-items-center justify-content-center">Emprestimos Fechados</div>
-                                    <div class="card-footer d-flex align-items-center justify-content-center">
-                                        <span class="text-white stretched-link">07</span>
+                                                        
+                            <!-- Earnings (Monthly) Card Example -->
+                            <div class="col-xl-3 col-md-6 mb-4">
+                                <div class="card border-left-success shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                    Equipamentos no setor</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">30</div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fa-solid fa-boxes-stacked fa-2x text-gray-300"></i>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-xl-3 col-md-6">
-                                <div class="card bg-success text-white mb-4">
-                                    <div class="card-body d-flex align-items-center justify-content-center">Equipamentos no setor</div>
-                                    <div class="card-footer d-flex align-items-center justify-content-center">
-                                        <span class="text-white stretched-link">06</span>
+
+                            <!-- Emprestimos Abertos -->
+                            <div class="col-xl-3 col-md-6 mb-4">
+                                <div class="card border-left-warning shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                    Emprestimos Abertos</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fa-solid fa-hourglass fa-2x text-gray-300"></i>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-xl-3 col-md-6">
-                                <div class="card bg-danger text-white mb-4">
-                                    <div class="card-body d-flex align-items-center justify-content-center">Equipamentos emprestados</div>
-                                    <div class="card-footer d-flex align-items-center justify-content-center">
-                                        <span class="text-white stretched-link">09</span>
+                            
+                        <!-- Pending Requests Card Example -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-danger shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                                Equipamentos Emprestados</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fa-solid fa-paper-plane fa-2x text-gray-300"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
                         <div class="card mb-4">
                             <div class="card-header">
                                 <i class="fas fa-table me-1"></i>
