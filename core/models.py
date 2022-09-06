@@ -1,6 +1,5 @@
 from django.db import models
 from cpf_field.models import CPFField
-
 # Create your models here.
 
 class Equipamento(models.Model):
@@ -39,11 +38,7 @@ class Colaborador(models.Model):
         unique=True
     )
 
-    cpf = CPFField('cpf',
-        null=False,
-        blank=False,
-        unique=True
-    )
+    cpf = CPFField('cpf')
 
     setor = models.CharField(
         max_length=100,

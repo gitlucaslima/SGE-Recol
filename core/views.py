@@ -1,6 +1,6 @@
-from django.shortcuts import get_object_or_404, redirect, render
 from core.models import *
 from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect, render
 
 
 def index(request):
@@ -10,8 +10,17 @@ def colaborador(request):
     return render(request, template_name='colaborador/colaborador.html')
 
 def cadastrarEquipamento(request):
-   
-    if request.method == "POST":
+
+    if request.method == "GET":
+
+        equipamentos = Equipamento.objects.all()
+        context = {}
+        context['equipamentos'] = equipamentos
+
+        return render(request, template_name='equipamento/equipamento.html', context=context)
+    
+    elif request.method == "POST":
+
         nome = request.POST.get("nome")
         n_serie = request.POST.get("n_serie")
         quantidade = request.POST.get("quantidade")
@@ -26,36 +35,32 @@ def cadastrarEquipamento(request):
         jaExisteNome = Equipamento.objects.filter(nome=nome)
         jaExisteN_serie = Equipamento.objects.filter(n_serie=n_serie)
 
+        equipamentos = Equipamento.objects.all()
+        context = {}
+        context['equipamentos'] = equipamentos
+
         if(jaExisteNome or jaExisteN_serie):
             messages.add_message(
                 request, messages.ERROR, 'Já existe um equipamento cadastrado')
+            return render(request, template_name='equipamento/equipamento.html', context=context)
 
-            return render(request, template_name='equipamento/equipamento.html')
-            
         try:
             novoEquipamento.save()
             messages.add_message(request, messages.SUCCESS,
                                  'Equipamento cadastrado com sucesso')
 
-            return render(request, template_name='equipamento/equipamento.html')
-
-
         except Error:
 
             messages.add_message(request, messages.ERROR, 'Ocorreu algum erro')
-        
-            return render(request, template_name='equipamento/equipamento.html')
-    else:
-        equipamentos = Equipamento.objects.all()
 
-        context = {
-            "equipamentos": equipamentos
-        }
 
     return render(request, template_name='equipamento/equipamento.html', context=context)
 
 
 def editarEquipamento(request):
+
+    context = {}
+
     if request.method == "POST":
         id = request.POST.get("id")
         nome = request.POST.get("nome")
@@ -70,28 +75,37 @@ def editarEquipamento(request):
         equipamento.quantidade = quantidade
         equipamento.observacao = observacao
 
+        jaExisteNome = Equipamento.objects.filter(nome=nome)
+        jaExisteN_serie = Equipamento.objects.filter(n_serie=n_serie)
+
+        equipamentos = Equipamento.objects.all()
+        context['equipamentos'] = equipamentos
+
+        if(jaExisteNome or jaExisteN_serie):
+            messages.add_message(
+                request, messages.ERROR, 'Já existe um equipamento com essas especificações')
+            return render(request, template_name='equipamento/equipamento.html', context=context)
+
         try:
             equipamento.save()
             messages.add_message(request, messages.SUCCESS,
                                  "O equipamento foi atualizado com sucesso!")
-            return render(request, template_name='equipamento/equipamento.html')
+
             
         except ValueError:
             messages.add_message(request, messages.ERROR,
                                  "Não foi possivel atualizar o equipamento")
-
-        return render(request, template_name='equipamento/equipamento.html')
+            
         
-    else:
         equipamentos = Equipamento.objects.all()
+        context['equipamentos'] = equipamentos
 
-        context = {
-            "equipamentos": equipamentos
-        }
 
     return render(request, template_name='equipamento/equipamento.html', context=context)
 
 def deletarEquipamento(request):
+
+    context = {}
 
     if request.method == "POST":
         id = request.POST.get("id")
@@ -102,23 +116,18 @@ def deletarEquipamento(request):
             equipamento.delete()
             messages.add_message(request, messages.SUCCESS,
                                  "O equipamento foi excluido com sucesso!")
-            return render(request, template_name='equipamento/equipamento.html')
             
 
         except ValueError:
             messages.add_message(request, messages.ERROR,
                                  "Não foi possivel deletar o equipamento")
                                  
-        return render(request, template_name='equipamento/equipamento.html')
 
-    else:  
         equipamentos = Equipamento.objects.all()
+        context['equipamentos'] = equipamentos
         
-        contexto = {
-            "equipamentos": equipamentos
-        }
 
-    return render(request, template_name='equipamento/equipamento.html', context=contexto)
+    return render(request, template_name='equipamento/equipamento.html', context=context)
     
 
 
