@@ -11,7 +11,8 @@ class Equipamento(models.Model):
 
     n_serie = models.IntegerField(
         null=False,
-        blank=False
+        blank=False,
+        unique=True
     )
 
     quantidade = models.IntegerField(
@@ -35,16 +36,18 @@ class Colaborador(models.Model):
     email = models.EmailField(
         null=False,
         blank=False,
-        unique=True
     )
 
-    cpf = CPFField('cpf')
+    cpf = CPFField('cpf',
+        null=False,
+        blank=False,
+        unique=True
+    )
 
     setor = models.CharField(
         max_length=100,
         null=False,
         blank=False,
-        unique=True
     )
 
     def __str__(self):

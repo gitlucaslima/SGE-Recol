@@ -1,0 +1,58 @@
+<div class="modal fade" id="modalEditarColaborador{{item.id}}" aria-labelledby="modalEditarColaborador{{item.id}}"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><b>Editar Colaborador</b></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="card-body">
+                    <form action="{% url 'editarColaborador'%}" method='POST'>
+
+                      {% csrf_token %}
+                      <input type="hidden" name="id" value={{item.id}}>
+                      
+                      <div class="form-row">
+                        <div class="form-group col-md-6">
+                          <label for="nome">Nome</label>
+                          <input type="text" id="nome" value={{item.nome}} class="form-control" name="nome" required>
+                        </div>
+          
+                        <div class="form-group col-md-6">
+                          <label for="email">Email</label>
+                          <input type="email" class="form-control"value={{item.email}}  name="email" required>
+                        </div>
+                      </div>
+          
+                      <div class="form-group">
+                        <label for="cpf">CPF</label>
+                        <input type="text" id="cpf" maxlength="14" value="{{item.value}}" class="form-control" name="cpf" placeholder="Ex.: 000.000.000-00" required>
+                      </div>
+          
+                      <div class="form-group">
+                        <label for="setor">Setor</label>
+                        <input type="text" class="form-control" value={{item.setor}} name="setor" required> 
+                      </div>
+            
+                        <br>
+            
+                        <button type="submit" class="btn btn-primary">Editar</button>
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                        data-bs-target="#modalEditarColaborador{{item.id}}" data-bs-whatever="@mdo">Cancelar
+                    </button>
+            
+            
+                      </form>
+                </div>
+            
+
+            </div>
+            <div class="modal-footer">
+
+            </div>
+        </div>
+
+    </div>
+</div>

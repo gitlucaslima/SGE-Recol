@@ -4,7 +4,10 @@ from core.views import *
 
 urlpatterns = [
     path('', index, name='index'),
-    path('colaborador/', colaborador, name='colaborador'),
+    
+    path('cadastrarColaborador/', cadastrarColaborador, name='cadastrarColaborador'),
+    path('deletarColaborador/', deletarColaborador, name='deletarColaborador'),
+    path('editarColaborador/', editarColaborador, name='editarColaborador'),
 
     
     path('cadastrarEquipamento/', cadastrarEquipamento, name='cadastrarEquipamento'),
