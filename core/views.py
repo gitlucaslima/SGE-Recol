@@ -1,7 +1,8 @@
-from core.models import *
-from validate_docbr import CPF
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
+from validate_docbr import CPF
+
+from core.models import *
 
 
 def index(request):
