@@ -8,6 +8,7 @@ def index(request):
     return render(request, template_name='base.html')
 
 def cadastrarColaborador(request):
+   
     if request.method == "GET":
 
         colaboradores = Colaborador.objects.all()
@@ -54,7 +55,7 @@ def cadastrarColaborador(request):
             novoColaborador.save()
             messages.add_message(request, messages.SUCCESS,
                                  'Colaborador cadastrado com sucesso')
-        except Error:
+        except:
             messages.add_message(request, messages.ERROR, 'Ocorreu algum erro')
 
     return render(request, template_name='colaborador/colaborador.html', context=context)
