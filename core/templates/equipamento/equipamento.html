@@ -23,7 +23,7 @@
                 </div>
 
                 <div class="form-group col-md-12">
-                  <label for="n_serie">Número de Série</label>
+                  <label for="n_serie">N° de Série | Patrimônio </label>
                   <input type="text" class="form-control" name="n_serie" required>
                 </div>
               </div>
@@ -80,6 +80,7 @@
                       <th>Nome</th>
                       <th>Numero de série</th>
                       <th>Quantidade</th>
+                      <th>Situação</th>
                       <th>Detalhes</th>
                       <th>Ações</th>
                   </tr>
@@ -89,6 +90,7 @@
                     <th>Nome</th>
                     <th>Numero de série</th>
                     <th>Quantidade</th>
+                    <th>Situação</th>
                     <th>Detalhes</th>
                     <th>Ações</th>
                   </tr>
@@ -99,6 +101,7 @@
                   <td>{{item.nome}}</td>
                   <td>{{item.n_serie}}</td>
                   <td>{{item.quantidade}}</td>
+                  <td>{{item.status}}</td>
                   <td>{{item.observacao}}</td>
                   <td class="text-center">
                     <!-- Default dropstart button -->

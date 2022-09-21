@@ -1,6 +1,6 @@
-from django.db import models
 from cpf_field.models import CPFField
-# Create your models here.
+from django.db import models
+
 
 class Equipamento(models.Model):
     nome = models.CharField(
@@ -19,6 +19,14 @@ class Equipamento(models.Model):
         null=False,
         blank=False
     )
+
+    STATUS_EQUIPAMENTO = (
+        ("D", "Disponivel"),
+        ("E", "Emprestado"),
+        ("I", "Indisponivel")
+    )
+
+    status = models.CharField(max_length=1, choices=STATUS_EQUIPAMENTO, default="Disponivel", blank=False, null=True)
 
     observacao = models.TextField(max_length=300)
     
