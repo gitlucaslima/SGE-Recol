@@ -1,6 +1,13 @@
+from enum import unique
+
 from cpf_field.models import CPFField
+from django.contrib.auth.models import User
 from django.db import models
 
+STATUS_CHOICES =(
+    ("1", "Ativo"),
+    ("0", "Inativo"),
+)
 
 class Equipamento(models.Model):
     nome = models.CharField(
@@ -61,6 +68,20 @@ class Colaborador(models.Model):
     def __str__(self):
         return self.nome
 
+class Usuario(User):
+    setor = models.CharField(
+        max_length=100,
+        null=False,
+        blank=False,
+    )
+    status = models.IntegerField(
+        choices=STATUS_CHOICES,
+        default=0,
+        null=False
+    )
+
+    def __str__(self):
+        return self.username
 
 
 

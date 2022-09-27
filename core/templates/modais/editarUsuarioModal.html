@@ -1,0 +1,71 @@
+<div class="modal fade" id="modalEditarUsuario{{item.id}}" aria-labelledby="modalEditarUsuario{{item.id}}"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><b>Editar Usuario</b></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="card-body">
+                    <form action="{% url 'editarUsuario'%}" method='POST'>
+
+                      {% csrf_token %}
+                      <input type="hidden" name="id" value={{item.id}}>
+                      
+                      <div class="form-row">
+                        <div class="form-group col-md-6">
+                          <label for="nome">Nome</label>
+                          <input type="text" id="nome" value={{item.username}} class="form-control" name="nome" required>
+                        </div>
+          
+                        <div class="form-group col-md-6">
+                          <label for="email">Email</label>
+                          <input type="email" class="form-control"value={{item.email}}  name="email" required>
+                        </div>
+                      </div>
+          
+                      <div class="form-group">
+                        <label for="senha">Senha</label>
+                        <input type="password" id="senha" maxlength="14" value="{{item.password}}" class="form-control" name="senha" required>
+                      </div>
+
+                      <div class="col-12 col-md-6">
+                        <label for="status">Status do Usuário</label>
+                        <select class="form-control form-select" name="status" id="status">
+                            {% if item.status == 0 %}
+                            <option value="1" selected>Ativo</option>
+                            <option value="0">Inativo</option>
+                            {% else %}
+                            <option value="1">Ativo</option>
+                            <option value="0" selected>Inativo</option>
+                            {% endif %}
+                        </select>
+                    </div>
+          
+                      <div class="form-group">
+                        <label for="setor">Setor</label>
+                        <input type="text" class="form-control" value={{item.setor}} name="setor" required> 
+                      </div>
+            
+                        <br>
+            
+                        <button type="submit" class="btn btn-primary">Editar</button>
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                        data-bs-target="#modalEditarUsuario{{item.id}}" data-bs-whatever="@mdo">Cancelar
+                    </button>
+            
+            
+                      </form>
+                </div>
+            
+
+            </div>
+            <div class="modal-footer">
+
+            </div>
+        </div>
+
+    </div>
+</div>

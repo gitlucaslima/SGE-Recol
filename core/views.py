@@ -1,13 +1,130 @@
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from validate_docbr import CPF
 
 from core.models import *
 
 
+def login(request):
+    return render(request, template_name='login.html')
+
+@login_required
 def index(request):
     return render(request, template_name='base.html')
 
+@login_required      
+def cadastrarUsuario(request):
+    if request.method == "GET":
+
+        usuarios = Usuario.objects.all()
+        context = {}
+        context['usuarios'] = usuarios
+
+        return render(request, template_name='gerenciarAcesso/registrarUsuario/registro.html', context=context)
+
+    elif request.method == "POST":
+        nome = request.POST.get("nome")
+        email = request.POST.get("email")
+        senha = request.POST.get("password")
+        setor = request.POST.get("setor")
+
+        novoUsuario = Usuario()
+        novoUsuario.username = nome
+        novoUsuario.email = email
+        novoUsuario.password = senha
+        novoUsuario.setor = setor
+
+        jaExisteNome = Usuario.objects.filter(username=nome)
+        jaExisteEmail = Usuario.objects.filter(email=email)
+
+        if(jaExisteNome or jaExisteEmail):
+            messages.add_message(
+                request, messages.ERROR, 'Já existe um usuario cadastrado')
+
+            return render(request, template_name='gerenciarAcesso/registrarUsuario/registro.html')
+
+        try:
+            novoUsuario.save()
+            messages.add_message(request, messages.SUCCESS,
+                                 'Usuario cadastrado com sucesso')
+        except:
+            messages.add_message(request, messages.ERROR, 'Ocorreu algum erro')
+
+        usuarios = Usuario.objects.all()
+        context = {}
+        context['usuarios'] = usuarios
+
+        return render(request, template_name='gerenciarAcesso/registrarUsuario/registro.html', context=context)
+
+@login_required
+def deletarUsuario(request):
+        context = {}
+
+        if request.method == "POST":
+            id = request.POST.get("id")
+
+            colaborador = get_object_or_404(Usuario, id=id)
+
+            try:
+                colaborador.delete()
+                messages.add_message(request, messages.SUCCESS,
+                                 "O usuario foi excluido com sucesso!")
+            
+
+            except ValueError:
+                messages.add_message(request, messages.ERROR,
+                                 "Não foi possivel excluir o usuario")
+                                 
+
+            usuarios = Usuario.objects.all()
+            context['usuarios'] = usuarios
+        
+
+        return render(request, template_name='gerenciarAcesso/registrarUsuario/registro.html', context=context)
+
+@login_required
+def editarUsuario(request):
+        context = {}
+
+        if request.method == "POST":
+            id = request.POST.get("id")
+            nome = request.POST.get("nome")
+            email = request.POST.get("email")
+            senha = request.POST.get("senha")
+            setor = request.POST.get("setor")
+            status = request.POST.get("status")
+
+            usuario = Usuario.objects.filter(id=int(id)).first()
+            usuario.username = nome
+            usuario.email = email
+            usuario.password = senha
+            usuario.setor = setor
+            usuario.status = status
+
+            jaExisteNome = Usuario.objects.filter(username=nome).first()
+            jaExisteEmail = Usuario.objects.filter(email=email).first()
+
+            if(jaExisteNome and jaExisteEmail):
+                if(jaExisteNome.username != usuario.username or jaExisteEmail.email != usuario.email):
+                    messages.add_message(
+                        request, messages.ERROR, 'Já existe um colaborador cadastrado')
+                    return render(request, template_name='gerenciarAcesso/registrarUsuario/registro.html', context=context)
+
+            try:
+                usuario.save()
+                messages.add_message(request, messages.SUCCESS,
+                                    'Registros atualizados com sucesso')
+            except:
+                messages.add_message(request, messages.ERROR, 'Ocorreu algum erro')
+
+            usuarios = Usuario.objects.all()
+            context = {}
+            context['usuarios'] = usuarios
+
+        return render(request, template_name='gerenciarAcesso/registrarUsuario/registro.html', context=context)
+
+@login_required
 def cadastrarColaborador(request):
    
     if request.method == "GET":
@@ -15,7 +132,7 @@ def cadastrarColaborador(request):
         colaboradores = Colaborador.objects.all()
         context = {}
         context['colaboradores'] = colaboradores
-
+        
         return render(request, template_name='colaborador/colaborador.html', context=context)
 
     elif request.method == "POST":
@@ -61,6 +178,7 @@ def cadastrarColaborador(request):
 
     return render(request, template_name='colaborador/colaborador.html', context=context)
 
+@login_required
 def deletarColaborador(request):
     context = {}
 
@@ -86,7 +204,7 @@ def deletarColaborador(request):
 
     return render(request, template_name='colaborador/colaborador.html', context=context)
 
-
+@login_required
 def editarColaborador(request):
     context = {}
 
@@ -102,7 +220,6 @@ def editarColaborador(request):
         colaborador.email = email
         colaborador.cpf = cpf
         colaborador.setor = setor
-
 
         colaboradores = Colaborador.objects.all()
         context = {}
@@ -137,6 +254,7 @@ def editarColaborador(request):
 
     return render(request, template_name='colaborador/colaborador.html', context=context)
 
+@login_required
 def cadastrarEquipamento(request):
 
     if request.method == "GET":
@@ -184,6 +302,7 @@ def cadastrarEquipamento(request):
 
     return render(request, template_name='equipamento/equipamento.html', context=context)
 
+@login_required
 def editarEquipamento(request):
 
     context = {}
@@ -230,6 +349,7 @@ def editarEquipamento(request):
 
     return render(request, template_name='equipamento/equipamento.html', context=context)
 
+@login_required
 def deletarEquipamento(request):
 
     context = {}
@@ -255,11 +375,11 @@ def deletarEquipamento(request):
         
 
     return render(request, template_name='equipamento/equipamento.html', context=context)
-    
 
-
+@login_required
 def novoEmprestimo(request):
     return render(request, template_name='emprestimo/novoEmprestimo.html')
 
+@login_required
 def encerrarEmprestimo(request):
     return render(request, template_name='emprestimo/encerrarEmprestimo.html')

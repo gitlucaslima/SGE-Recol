@@ -1,8 +1,10 @@
-from django.urls import path
+from django.urls import include, path
+
 from core.views import *
 
 urlpatterns = [
     path('', index, name='index'),
+    path('accounts/', include('django.contrib.auth.urls')),
     
     path('cadastrarColaborador/', cadastrarColaborador, name='cadastrarColaborador'),
     path('deletarColaborador/', deletarColaborador, name='deletarColaborador'),
@@ -16,6 +18,12 @@ urlpatterns = [
 
     path('novoEmprestimo/', novoEmprestimo, name='novoEmprestimo'),
     path('encerrarEmprestimo/', encerrarEmprestimo, name='encerrarEmprestimo'),
+
+    path('cadastrarUsuario/', cadastrarUsuario, name='cadastrarUsuario'),
+    path('deletarUsuario/', deletarUsuario, name='deletarUsuario'),
+    path('editarUsuario/', editarUsuario, name='editarUsuario'),
+
+
 
 
 ]
