@@ -1,3 +1,4 @@
+{% load static %}
 <div class="modal fade" id="modalEditarUsuario{{item.id}}" aria-labelledby="modalEditarUsuario{{item.id}}"
     aria-hidden="true">
     <div class="modal-dialog">
@@ -26,10 +27,10 @@
                         </div>
                       </div>
           
-                      <div class="form-group">
+                      <div class="form-group col-md-3">
                         <label for="senha">Senha</label>
-                        <input type="password" id="senha" maxlength="14" value="{{item.password}}" class="form-control" name="senha" required>
-                      </div>
+                        <input type="text" id="pass" maxlength="14" value="{{item.password}}" class="form-control" name="senha" required>
+                    </div>
 
                       <div class="col-12 col-md-6">
                         <label for="status">Status do Usuário</label>

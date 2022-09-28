@@ -4,7 +4,9 @@ from core.views import *
 
 urlpatterns = [
     path('', index, name='index'),
-    path('accounts/', include('django.contrib.auth.urls')),
+    path('login/', login, name='login'),
+    # path('accounts/logout', logout, name='logout'),
+
     
     path('cadastrarColaborador/', cadastrarColaborador, name='cadastrarColaborador'),
     path('deletarColaborador/', deletarColaborador, name='deletarColaborador'),

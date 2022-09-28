@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth import login as login_check
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from validate_docbr import CPF
@@ -7,13 +8,31 @@ from core.models import *
 
 
 def login(request):
-    return render(request, template_name='login.html')
+    if request.method == 'POST':
+        email = request.POST.get("email")
+        senha = request.POST.get("senha")
 
-@login_required
+        user = Usuario.objects.filter(email=email).first()
+        print(user)
+
+        if(not user):
+
+            messages.add_message(request, messages.ERROR,
+                                "Login ou senha inválidos")
+            return redirect("login")
+
+        is_equal_password = user.check_password(senha)
+
+        if(is_equal_password):
+
+            login_check(request, user)
+
+            return redirect("/")
+    return render(request, template_name='gerenciarAcesso/login.html')
+
 def index(request):
     return render(request, template_name='base.html')
-
-@login_required      
+    
 def cadastrarUsuario(request):
     if request.method == "GET":
 
@@ -45,6 +64,10 @@ def cadastrarUsuario(request):
             return render(request, template_name='gerenciarAcesso/registrarUsuario/registro.html')
 
         try:
+            
+            novoUsuario.is_staff = True
+            novoUsuario.is_admin = True
+            novoUsuario.is_superuser = True
             novoUsuario.save()
             messages.add_message(request, messages.SUCCESS,
                                  'Usuario cadastrado com sucesso')
@@ -57,7 +80,6 @@ def cadastrarUsuario(request):
 
         return render(request, template_name='gerenciarAcesso/registrarUsuario/registro.html', context=context)
 
-@login_required
 def deletarUsuario(request):
         context = {}
 
@@ -83,7 +105,6 @@ def deletarUsuario(request):
 
         return render(request, template_name='gerenciarAcesso/registrarUsuario/registro.html', context=context)
 
-@login_required
 def editarUsuario(request):
         context = {}
 

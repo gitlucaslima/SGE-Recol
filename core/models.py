@@ -1,6 +1,9 @@
 from enum import unique
+from urllib import request
 
 from cpf_field.models import CPFField
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -74,6 +77,7 @@ class Usuario(User):
         null=False,
         blank=False,
     )
+
     status = models.IntegerField(
         choices=STATUS_CHOICES,
         default=0,
