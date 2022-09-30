@@ -11,7 +11,7 @@
         {% block title %}
         <title>SGE</title>
         {% endblock title %}
-
+        
         <link rel="icon" href="http://gruporecol.net/v/wp-content/themes/recol/favicon.ico">
         <link href= "https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
         <link href= {% static 'css/styles.css' %} rel="stylesheet" />
@@ -36,7 +36,7 @@
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                         <li><a class="dropdown-item" href="#!">Configurações</a></li>
                         <li><hr class="dropdown-divider" /></li>
-                        <li><a class="dropdown-item" href="/">Sair</a></li>
+                        <li><a class="dropdown-item" href="{% url 'logout' %}">Sair</a></li>
                     </ul>
                 </li>
             </ul>
