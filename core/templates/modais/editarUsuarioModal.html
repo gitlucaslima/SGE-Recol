@@ -1,4 +1,3 @@
-{% load static %}
 <div class="modal fade" id="modalEditarUsuario{{item.id}}" aria-labelledby="modalEditarUsuario{{item.id}}"
     aria-hidden="true">
     <div class="modal-dialog">
@@ -23,14 +22,9 @@
           
                         <div class="form-group col-md-6">
                           <label for="email">Email</label>
-                          <input type="email" class="form-control"value={{item.email}}  name="email" required>
+                          <input type="email" class="form-control" value={{item.email}}  name="email" required>
                         </div>
                       </div>
-          
-                      <div class="form-group col-md-3">
-                        <label for="senha">Senha</label>
-                        <input type="text" id="pass" maxlength="14" value="{{item.password}}" class="form-control" name="senha" required>
-                    </div>
 
                       <div class="col-12 col-md-6">
                         <label for="status">Status do Usuário</label>

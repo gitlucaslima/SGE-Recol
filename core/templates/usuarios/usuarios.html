@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
-
 {% block tituloPagina %}
-<h1 class="mt-4">Usuario</h1>
+<h1 class="mt-4">Usuarios</h1>
 {% endblock tituloPagina %}
 
 {% block conteudo %}
@@ -34,33 +33,31 @@
               </div>
 
               <div class="form-group col-md-12">
-                <label for="setor">Cargo(ou Função)</label>
+                <label for="setor">Setor</label>
                 <input type="text" class="form-control" name="setor"> 
               </div>
 
               <br>
 
               <div class="d-flex justify-content-center row">
-                <div class="col-12 col-md-3 text-center">
-                    <button type="submit" class="btn btn-success btn-icon-split">
-                        <span class="icon text-white-50">
-                            <i class="fas fa-check"></i>
-                        </span>
-                        <span class="text">Salvar</span>
-                    </button>
+                    <div class="col-12 col-md-3 text-center">
+                        <button type="submit" class="btn btn-success btn-icon-split">
+                            <span class="icon text-white-50">
+                                <i class="fas fa-check"></i>
+                            </span>
+                            <span class="text">Salvar</span>
+                        </button>
+                    </div>
+
+                    <div class="col-12 col-md-3 text-center">
+                        <button type="reset" class="btn btn-danger btn-icon-split">
+                            <span class="icon text-white-50">
+                                <i class="fas fa-close"></i>
+                            </span>
+                            <span class="text">Cancelar</span>
+                        </button>
+                    </div>
                 </div>
-
-                <div class="col-12 col-md-3 text-center">
-                    <button type="reset" class="btn btn-danger btn-icon-split">
-                        <span class="icon text-white-50">
-                            <i class="fas fa-close"></i>
-                        </span>
-                        <span class="text">Cancelar</span>
-                    </button>
-                </div>
-            </div>
-
-
             </form>
       </div>
       
@@ -77,10 +74,11 @@
           <table id="datatablesSimple">
               <thead>
                   <tr>
-                      <th>Nome</th>
-                      <th>Email</th>
-                      <th>Status</th>
-                      <th>Função</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Função</th>
+                    <th>Opções</th>
                   </tr>
               </thead>
               <tfoot>
@@ -89,21 +87,22 @@
                     <th>Email</th>
                     <th>Status</th>
                     <th>Função</th>
+                    <th>Opções</th>
                   </tr>
               </tfoot>
               <tbody>
                 {% for item in usuarios %}
                 <tr>
-                  <td>{{item.username}}</td>
-                  <td>{{item.email}}</td>
-                  <td>
-                    {% if item.status == 1 %}
-                        Ativo
-                    {% else %}
-                        Inativo
-                    {% endif %}
-            </td>
-                  <td>{{item.setor}}</td>
+                    <td>{{item.username}}</td>
+                    <td>{{item.email}}</td>
+                    <td>
+                        {% if item.status == 1 %}
+                            Ativo
+                        {% else %}
+                            Inativo
+                        {% endif %}
+                    <td>{{item.setor}}</td>
+                </td>
                   <td class="text-center">
                     <!-- Default dropstart button -->
                     <div class="btn-group dropstart">

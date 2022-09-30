@@ -1,4 +1,4 @@
-from enum import unique
+from enum import auto, unique
 from urllib import request
 
 from cpf_field.models import CPFField
@@ -7,10 +7,6 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.db import models
 
-STATUS_CHOICES =(
-    ("1", "Ativo"),
-    ("0", "Inativo"),
-)
 
 class Equipamento(models.Model):
     nome = models.CharField(
@@ -62,6 +58,12 @@ class Colaborador(models.Model):
         unique=True
     )
 
+    rg = models.CharField(
+        max_length=9,
+        null=False,
+        blank=False
+    )
+
     setor = models.CharField(
         max_length=100,
         null=False,
@@ -78,6 +80,11 @@ class Usuario(User):
         blank=False,
     )
 
+    STATUS_CHOICES =(
+        ("1", "Ativo"),
+        ("0", "Inativo"),
+    )
+
     status = models.IntegerField(
         choices=STATUS_CHOICES,
         default=0,
@@ -86,6 +93,47 @@ class Usuario(User):
 
     def __str__(self):
         return self.username
+
+class Emprestimo(models.Model):
+    colaborador = models.ForeignKey(Colaborador, 
+    on_delete=models.CASCADE
+    )
+
+    data_criacao = models.DateField(
+        auto_now=True,
+        null=False,
+        blank=False,
+    )
+
+    emprestimo_equipamento = models.ForeignKey(
+        Equipamento,
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False,
+    )
+
+    assinatura_colaborador = models.ImageField(        
+        null=False,
+        blank=False,
+    )
+
+    assinatura_responsavel = models.ImageField(        
+        null=False,
+        blank=False,
+    )
+
+    STATUS_EMPRESTIMO_CHOICES = (
+        ("0", "Atrasado"),
+        ("1", "Aberto"),
+        ("2", "Encerrado"),
+    )
+
+    status_emprestimo = models.IntegerField(
+        choices = STATUS_EMPRESTIMO_CHOICES,
+        default = 1,
+        blank=False,
+        null = False,
+    )
 
 
 

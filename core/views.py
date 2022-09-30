@@ -1,5 +1,8 @@
+from timeit import repeat
+
 from django.contrib import messages
 from django.contrib.auth import login as login_check
+from django.contrib.auth import logout as logout_django
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from validate_docbr import CPF
@@ -8,31 +11,103 @@ from core.models import *
 
 
 def login(request):
+    tem_usuarios = len(Usuario.objects.all())
+
+    if(not tem_usuarios):
+        return redirect('registrar')
+
     if request.method == 'POST':
         email = request.POST.get("email")
         senha = request.POST.get("senha")
 
         user = Usuario.objects.filter(email=email).first()
-        print(user)
 
         if(not user):
 
             messages.add_message(request, messages.ERROR,
                                 "Login ou senha inválidos")
             return redirect("login")
+        
+        is_user = user.check_password(senha)
+        is_active = user.status
 
-        is_equal_password = user.check_password(senha)
+        if(is_active == 0):
+            messages.add_message(request, messages.INFO,
+                    "Usuario inativo, entre em contato com o administrador do sistema")
+            return redirect("login")
 
-        if(is_equal_password):
-
+        if(is_user and (is_active == 1) ):
             login_check(request, user)
 
-            return redirect("/")
-    return render(request, template_name='gerenciarAcesso/login.html')
+            return render(request, template_name='base.html')
+        else:
+            messages.add_message(request, messages.ERROR,
+                                "Login ou senha inválidos")
+            return redirect("login")
 
+    return render(request, template_name='accounts/login.html')
+
+def registrar(request):
+
+    is_usuarios = len(Usuario.objects.all())
+
+    # Impede que alguém acesse essa funcionalidade sem a necessidade
+    if is_usuarios:
+
+        return redirect('login')
+
+    if(request.method == "POST"):
+        nome = request.POST.get("nome")
+        email = request.POST.get("email")
+        senha = request.POST.get("senha")
+        senhaRepeat = request.POST.get("senha-repeat")
+        setor = request.POST.get("setor")
+        print(setor)
+
+        novoUsuario = Usuario()
+
+        if senha == senhaRepeat:
+
+            novo_usuario = Usuario()
+            novo_usuario.email = email
+            novoUsuario.setor = setor
+            novo_usuario.username = nome
+            novo_usuario.status = 1
+            novo_usuario.set_password(senha)
+            
+            try:
+
+                novo_usuario.save()
+                messages.add_message(
+                    request, messages.SUCCESS, "Usuário criado com sucesso")
+                return redirect('login')
+            except Exception as e:
+
+                messages.add_message(
+                    request, messages.ERROR, "Ocorreu um erro ao salvar o usuário, tente novamente mais tarde")
+                return redirect("login")
+
+        else:
+
+            messages.add_message(request, messages.ERROR,
+                                 "A senha não são iguais")
+            return redirect("registro")
+
+    else:
+
+        return render(request, 'accounts/registro.html')
+
+def logout(request):
+
+    logout_django(request)
+
+    return redirect("login")
+
+@login_required 
 def index(request):
     return render(request, template_name='base.html')
-    
+
+@login_required 
 def cadastrarUsuario(request):
     if request.method == "GET":
 
@@ -40,7 +115,7 @@ def cadastrarUsuario(request):
         context = {}
         context['usuarios'] = usuarios
 
-        return render(request, template_name='gerenciarAcesso/registrarUsuario/registro.html', context=context)
+        return render(request, template_name='usuarios/usuarios.html', context=context)
 
     elif request.method == "POST":
         nome = request.POST.get("nome")
@@ -51,7 +126,7 @@ def cadastrarUsuario(request):
         novoUsuario = Usuario()
         novoUsuario.username = nome
         novoUsuario.email = email
-        novoUsuario.password = senha
+        novoUsuario.set_password(senha)
         novoUsuario.setor = setor
 
         jaExisteNome = Usuario.objects.filter(username=nome)
@@ -61,7 +136,7 @@ def cadastrarUsuario(request):
             messages.add_message(
                 request, messages.ERROR, 'Já existe um usuario cadastrado')
 
-            return render(request, template_name='gerenciarAcesso/registrarUsuario/registro.html')
+            return render(request, template_name='usuarios/usuarios.html')
 
         try:
             
@@ -78,8 +153,9 @@ def cadastrarUsuario(request):
         context = {}
         context['usuarios'] = usuarios
 
-        return render(request, template_name='gerenciarAcesso/registrarUsuario/registro.html', context=context)
+        return render(request, template_name='usuarios/usuarios.html', context=context)
 
+@login_required 
 def deletarUsuario(request):
         context = {}
 
@@ -103,8 +179,9 @@ def deletarUsuario(request):
             context['usuarios'] = usuarios
         
 
-        return render(request, template_name='gerenciarAcesso/registrarUsuario/registro.html', context=context)
+        return render(request, template_name='usuarios/usuarios.html', context=context)
 
+@login_required 
 def editarUsuario(request):
         context = {}
 
@@ -112,14 +189,12 @@ def editarUsuario(request):
             id = request.POST.get("id")
             nome = request.POST.get("nome")
             email = request.POST.get("email")
-            senha = request.POST.get("senha")
             setor = request.POST.get("setor")
             status = request.POST.get("status")
 
             usuario = Usuario.objects.filter(id=int(id)).first()
             usuario.username = nome
             usuario.email = email
-            usuario.password = senha
             usuario.setor = setor
             usuario.status = status
 
@@ -130,7 +205,7 @@ def editarUsuario(request):
                 if(jaExisteNome.username != usuario.username or jaExisteEmail.email != usuario.email):
                     messages.add_message(
                         request, messages.ERROR, 'Já existe um colaborador cadastrado')
-                    return render(request, template_name='gerenciarAcesso/registrarUsuario/registro.html', context=context)
+                    return render(request, template_name='usuarios/usuarios.html', context=context)
 
             try:
                 usuario.save()
@@ -143,9 +218,9 @@ def editarUsuario(request):
             context = {}
             context['usuarios'] = usuarios
 
-        return render(request, template_name='gerenciarAcesso/registrarUsuario/registro.html', context=context)
+        return render(request, template_name='usuarios/usuarios.html', context=context)
 
-@login_required
+@login_required 
 def cadastrarColaborador(request):
    
     if request.method == "GET":
@@ -161,12 +236,15 @@ def cadastrarColaborador(request):
         email = request.POST.get("email")
         cpf = request.POST.get("cpf")
         setor = request.POST.get("setor")
+        rg = request.POST.get("rg")
+
 
         novoColaborador = Colaborador()
         novoColaborador.nome = nome
         novoColaborador.email = email
         novoColaborador.cpf = cpf
         novoColaborador.setor = setor
+        novoColaborador.rg = rg
 
         jaExisteNome = Colaborador.objects.filter(nome=nome)
         jaExisteCpf = Colaborador.objects.filter(cpf=cpf)
@@ -235,12 +313,15 @@ def editarColaborador(request):
         email = request.POST.get("email")
         cpf = request.POST.get("cpf")
         setor = request.POST.get("setor")
+        rg = request.POST.get("rg")
+
 
         colaborador = Colaborador.objects.filter(id=int(id)).first()
         colaborador.nome = nome
         colaborador.email = email
         colaborador.cpf = cpf
         colaborador.setor = setor
+        colaborador.rg = rg
 
         colaboradores = Colaborador.objects.all()
         context = {}
