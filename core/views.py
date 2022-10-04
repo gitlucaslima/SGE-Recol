@@ -1,3 +1,4 @@
+from multiprocessing.sharedctypes import Value
 from timeit import repeat
 
 from django.contrib import messages
@@ -105,7 +106,16 @@ def logout(request):
 
 @login_required 
 def index(request):
-    return render(request, template_name='base.html')
+
+    context = {}
+
+    # Equipamentos disponiveis
+    e_dispo = Equipamento.objects.filter(status='Disponivel').count()
+
+
+    context['e_dispo'] = e_dispo
+
+    return render(request, template_name='base.html', context=context)
 
 @login_required 
 def cadastrarUsuario(request):
@@ -129,8 +139,8 @@ def cadastrarUsuario(request):
         novoUsuario.set_password(senha)
         novoUsuario.setor = setor
 
-        jaExisteNome = Usuario.objects.filter(username=nome)
-        jaExisteEmail = Usuario.objects.filter(email=email)
+        jaExisteNome = Usuario.objects.filter(username=nome).first()
+        jaExisteEmail = Usuario.objects.filter(email=email).first()
 
         if(jaExisteNome or jaExisteEmail):
             messages.add_message(
@@ -248,6 +258,9 @@ def cadastrarColaborador(request):
 
         jaExisteNome = Colaborador.objects.filter(nome=nome)
         jaExisteCpf = Colaborador.objects.filter(cpf=cpf)
+        jaEmail = Colaborador.objects.filter(email=email)
+        jaRg= Colaborador.objects.filter(rg=rg)
+
 
         colaboradores = Colaborador.objects.all()
         context = {}
@@ -263,7 +276,7 @@ def cadastrarColaborador(request):
                 request, messages.ERROR, 'Esse número de CPF é invalido')
             return render(request, template_name='colaborador/colaborador.html', context=context)
 
-        if(jaExisteNome or jaExisteCpf):
+        if(jaExisteNome or jaExisteCpf or jaEmail or jaRg):
             messages.add_message(
                 request, messages.ERROR, 'Já existe um colaborador cadastrado')
             return render(request, template_name='colaborador/colaborador.html', context=context)
@@ -272,8 +285,8 @@ def cadastrarColaborador(request):
             novoColaborador.save()
             messages.add_message(request, messages.SUCCESS,
                                  'Colaborador cadastrado com sucesso')
-        except:
-            messages.add_message(request, messages.ERROR, 'Ocorreu algum erro')
+        except ValueError as Error:
+            messages.add_message(request, messages.ERROR, 'Ocorreu algum erro {Error}')
 
     return render(request, template_name='colaborador/colaborador.html', context=context)
 
@@ -339,9 +352,15 @@ def editarColaborador(request):
 
         jaExisteNome = Colaborador.objects.filter(nome=nome).first()
         jaExisteCpf = Colaborador.objects.filter(cpf=cpf).first()
+        jaEmail = Colaborador.objects.filter(email=email).first()
+        jaRg = Colaborador.objects.filter(rg=rg).first()
 
-        if(jaExisteNome and jaExisteCpf):
-            if(jaExisteNome.nome != colaborador.nome or jaExisteCpf.cpf != colaborador.cpf):
+        if(jaExisteNome and jaExisteCpf and jaEmail and jaRg):
+            if(jaExisteNome.nome != colaborador.nome 
+            or jaExisteCpf.cpf != colaborador.cpf
+            or jaEmail.email != colaborador.email
+            or jaRg.rg != colaborador.rg
+            ):
                 messages.add_message(
                     request, messages.ERROR, 'Já existe um colaborador cadastrado')
                 return render(request, template_name='colaborador/colaborador.html', context=context)
@@ -371,13 +390,21 @@ def cadastrarEquipamento(request):
 
         nome = request.POST.get("nome")
         n_serie = request.POST.get("n_serie")
-        quantidade = request.POST.get("quantidade")
         observacao = request.POST.get("observacao")
 
+        quantidade = request.POST.get("quantidade")
+
         novoEquipamento = Equipamento()
+
+
+        if(quantidade):
+            novoEquipamento.quantidade = quantidade
+        else:
+            novoEquipamento.quantidade = 1
+
+            
         novoEquipamento.nome = nome
         novoEquipamento.n_serie = n_serie
-        novoEquipamento.quantidade = quantidade
         novoEquipamento.observacao = observacao
 
         jaExisteNome = Equipamento.objects.filter(nome=nome)
@@ -397,7 +424,7 @@ def cadastrarEquipamento(request):
             messages.add_message(request, messages.SUCCESS,
                                  'Equipamento cadastrado com sucesso')
 
-        except Error:
+        except:
 
             messages.add_message(request, messages.ERROR, 'Ocorreu algum erro')
 
@@ -413,36 +440,40 @@ def editarEquipamento(request):
         id = request.POST.get("id")
         nome = request.POST.get("nome")
         n_serie = request.POST.get("n_serie")
+        status = request.POST.get("status")
         quantidade = request.POST.get("quantidade")
         observacao = request.POST.get("observacao")
+        print(status)
 
-        equipamento = Equipamento.objects.filter(id=int(id)).first()
+        equipamento_edit = Equipamento.objects.filter(id=int(id)).first()
 
-        equipamento.nome = nome
-        equipamento.n_serie = n_serie
-        equipamento.quantidade = quantidade
-        equipamento.observacao = observacao
-
-        jaExisteNome = Equipamento.objects.filter(nome=nome)
-        jaExisteN_serie = Equipamento.objects.filter(n_serie=n_serie)
+        equipamento_edit.nome = nome
+        equipamento_edit.n_serie = n_serie
+        equipamento_edit.quantidade = quantidade
+        equipamento_edit.status = status
+        equipamento_edit.observacao = observacao
 
         equipamentos = Equipamento.objects.all()
         context['equipamentos'] = equipamentos
 
-        if(jaExisteNome or jaExisteN_serie):
-            messages.add_message(
-                request, messages.ERROR, 'Já existe um equipamento com essas especificações')
-            return render(request, template_name='equipamento/equipamento.html', context=context)
+        jaExisteNome = Equipamento.objects.filter(nome=nome).first()
+        jaExisteN_serie = Equipamento.objects.filter(n_serie=n_serie).first()
+
+        if(jaExisteNome and jaExisteN_serie):
+            if(jaExisteN_serie.id != equipamento_edit.id and jaExisteNome.id != equipamento_edit.id):
+                messages.add_message(
+                    request, messages.ERROR, 'Já existe um equipamento cadastrado')
+                return render(request, template_name='equipamento/equipamento.html', context=context)
 
         try:
-            equipamento.save()
+            equipamento_edit.save()
             messages.add_message(request, messages.SUCCESS,
                                  "O equipamento foi atualizado com sucesso!")
 
             
-        except ValueError:
+        except Exception as Error:
             messages.add_message(request, messages.ERROR,
-                                 "Não foi possivel atualizar o equipamento")
+                                 "Ocorreu um erro "+{Error})
             
         
         equipamentos = Equipamento.objects.all()

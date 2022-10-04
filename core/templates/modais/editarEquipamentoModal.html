@@ -28,40 +28,34 @@
 
                         <div class="form-group">
                           <label for="quantidade">Quantidade</label>
-                          <select type="number" values="{{item.quantidade}}" class="form-control" name="quantidade" min='1' required>
+                          <input type="number" value="{{item.quantidade}}" class="form-control" name="quantidade">
                         </div>
-
-                        {% comment %} AJEITAR AQUIIIIIIIIIIIIIIIII {% endcomment %}
 
                         <div class="form-group">
                           <label for="status">Situação</label>
-                          <input type="text" value="{{item.status}}" class="form-control" name="status" required>
+                          <select for"status" name="status" class="form-select" aria-label="Status do equipamento">
+                            <option selected value="{{ item.status }}">{{ item.status }}</option>
+                            <option value="Disponivel">Disponivel</option>
+                            <option value="Emprestado">Emprestado</option>
+                            <option value="Indisponivel">Indisponivel</option>
+                          </select>
                         </div>
-
-                        {% comment %} AJEITAR AQUIIIIIIIIIIIIIIIII {% endcomment %}
-
-            
+          
                         <div class="form-group">
                           <label for="observacao">Detalhes e Observações</label>
                           <input type="text" value="{{item.observacao}}" class="form-control" name="observacao"> 
-                        </div>
-            
-                        <br>
-            
-                        <button type="submit" class="btn btn-primary">Cadastrar</button>
-                        <button type="button" class="btn btn-danger" data-bs-toggle="modal"
-                        data-bs-target="#modalEditarEquipamento{{item.id}}" data-bs-whatever="@mdo">Cancelar
-                    </button>
-            
-            
+                        </div>           
+                    <div class="modal-footer">
+                      <button type="submit" class="btn btn-primary">Cadastrar</button>
+                      <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                      data-bs-target="#modalEditarEquipamento{{item.id}}" data-bs-whatever="@mdo">Cancelar
+                      </button>
+                    </div>
                       </form>
-                </div>
-            
+                </div>         
 
             </div>
-            <div class="modal-footer">
 
-            </div>
         </div>
 
     </div>

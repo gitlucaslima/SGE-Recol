@@ -22,8 +22,17 @@ class Equipamento(models.Model):
     )
 
     quantidade = models.IntegerField(
+        default=1,
         null=False,
-        blank=False
+        blank=True
+    )
+
+    arquivo_foto = models.FileField(
+        ('Foto do objeto'), 
+        null=True, 
+        blank=True, 
+        upload_to='midias', 
+        help_text='Tamanho máximo de 64MB'
     )
 
     STATUS_EQUIPAMENTO = (
@@ -44,12 +53,14 @@ class Colaborador(models.Model):
     nome = models.CharField(
         max_length=200,
         null=False,
-        blank=False
+        blank=False,
+        unique=True
     )
 
     email = models.EmailField(
         null=False,
         blank=False,
+        unique=True
     )
 
     cpf = CPFField('cpf',
@@ -61,7 +72,9 @@ class Colaborador(models.Model):
     rg = models.CharField(
         max_length=9,
         null=False,
-        blank=False
+        blank=False,
+        unique=True
+
     )
 
     setor = models.CharField(
@@ -96,7 +109,9 @@ class Usuario(User):
 
 class Emprestimo(models.Model):
     colaborador = models.ForeignKey(Colaborador, 
-    on_delete=models.CASCADE
+        on_delete=models.PROTECT,
+        null=False,
+        blank=False,
     )
 
     data_criacao = models.DateField(
@@ -105,9 +120,15 @@ class Emprestimo(models.Model):
         blank=False,
     )
 
+    data_encerramento = models.DateField(
+        auto_now=False,
+        null=False,
+        blank=False,
+    )
+
     emprestimo_equipamento = models.ForeignKey(
         Equipamento,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         null=False,
         blank=False,
     )
