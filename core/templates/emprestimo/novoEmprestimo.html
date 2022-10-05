@@ -32,14 +32,14 @@
                 </div>
 
                 <label for="equipamento">Equipamento</label>
-                <select name="equipamento" id="dropdownEquip" class="form-control form-group col-md-12" onchange="changeHiddenInputEquip(this)" required>
-                    <option selected>Selecione o equipamento</option>
+                <select name="equipamento" id="dropdownEquip" class="form-control form-group col-md-12" placeholder='Nenhum valor selecionado...' onchange="changeHiddenInputEquip(this)" required>
+                    <option selected>Selecione um equipamento</option>
                     {% for equipamento in equipamentos %}
-                        <option value={{equipamento.nome}}>{{equipamento.nome}}</option>
+                        <option value={{equipamento.quantidade}}>{{equipamento}}</option>
                     {% endfor %}
-                </select>         
-                <input type="hidden" name="hiddenInputEquip" id="hiddenInputEquip" />
-                <input type="hidden" name="hiddenInputEquip" id="hiddenInputEquip" />
+                </select>
+
+                <input type="hidden" name="hiddenInputEquip" id="hiddenInputEquip"/>
 
                 <div class="row">
                     <div class="form-group col-md-8">
@@ -50,7 +50,9 @@
                         <label for="quantidade">Disponivel</label>
                         <input type="number" id="quantidadeDisponivel" value="{{equipamento.quantidade}}" max="{{equipamento.quantidade}}" class="form-control" name="quantidadeDisponivel" disabled>
                     </div>
-                        
+
+                    <input type="hidden" name="nomeEquipamento" value="nome" id="nomeEquipamento"/>
+
                     <div id="minhaDiv" display="none" class="mt-2 ml-3 mr-3 form-group alert alert-danger" role="alert">
                         Quantidade maior que a disponivel.
                       </div>

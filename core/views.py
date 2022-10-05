@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from validate_docbr import CPF
+from datetime import date, timedelta
 
 from core.models import *
 
@@ -65,15 +66,12 @@ def registrar(request):
         senha = request.POST.get("senha")
         senhaRepeat = request.POST.get("senha-repeat")
         setor = request.POST.get("setor")
-        print(setor)
-
-        novoUsuario = Usuario()
 
         if senha == senhaRepeat:
 
             novo_usuario = Usuario()
             novo_usuario.email = email
-            novoUsuario.setor = setor
+            novo_usuario.setor = setor
             novo_usuario.username = nome
             novo_usuario.status = 1
             novo_usuario.set_password(senha)
@@ -139,6 +137,7 @@ def cadastrarUsuario(request):
         novoUsuario.email = email
         novoUsuario.set_password(senha)
         novoUsuario.setor = setor
+
 
         jaExisteNome = Usuario.objects.filter(username=nome).first()
         jaExisteEmail = Usuario.objects.filter(email=email).first()
@@ -521,15 +520,43 @@ def novoEmprestimo(request):
 
     if request.method == "POST":
         colaborador = request.POST.get("colaborador")
-        equipamento = request.POST.get("equipamento")
+        nomeEquipamento = request.POST.get("nomeEquipamento")
         quantidade = request.POST.get("quantidade")
 
+        print('-----------Dados do POST-----------')
         print(colaborador)
-        print(equipamento)
+        print(nomeEquipamento)
         print(quantidade)
-        print(request.body)
+        print('----------------------')
 
 
+        print('-----------Dados do Emprestimo-----------')
+        colaboradorRequisitante = Colaborador.objects.filter(cpf=colaborador).first()
+        equipamentoEmprestimo = Equipamento.objects.filter(nome=nomeEquipamento).first()
+
+        print(colaboradorRequisitante.nome)
+        print(equipamentoEmprestimo)
+
+        novoEmprestimo = Emprestimo()
+
+        novoEmprestimo.colaborador = colaboradorRequisitante
+
+        # Emprestimo aberto no dia da solicittação
+        novoEmprestimo.data_criacao = date.today()
+        equipamentoEmprestimo.quantidade = equipamentoEmprestimo.quantidade-int(quantidade)
+        novoEmprestimo.emprestimo_equipamento = equipamentoEmprestimo
+
+        # Emprestimo 1 de validade
+        novoEmprestimo.data_encerramento = novoEmprestimo.data_criacao + timedelta(365)
+        print(novoEmprestimo.data_criacao)
+        print(novoEmprestimo.data_encerramento)
+        print(equipamentoEmprestimo.quantidade)
+
+
+
+
+
+        print('----------------------')
 
 
 
