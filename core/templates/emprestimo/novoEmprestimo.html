@@ -1,8 +1,107 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block tituloPagina %}
 <h1 class="mt-4">Novo Emprestimo</h1>
 {% endblock tituloPagina %}
 
 {% block conteudo %}
+<div class="container d-flex justify-content-center">
+    <div class="card w-75 shadow h-100 py-2 ">
+        <h5 class="card-header">Novo Emprestimo</h5>
+
+        {% include 'alerts/messages.html' %}
+        
+        <div class="card-body">
+            <form action="{% url 'novoEmprestimo'%}" id="form-novoEmprestimo" method="post">
+
+            {% csrf_token %}
+                <label for="colaborador">Colaborador</label>
+                <select name="colaborador" id="dropdown" class="form-control form-group col-md-12" onchange="changeHiddenInput(this)" >
+                    <option selected>Selecione um colaborador</option>
+                    {% for colaborador in colaboradores %}
+                        <option value={{colaborador.cpf}}>{{colaborador}}</option>
+                    {% endfor %}
+                </select>         
+                <input type="hidden" name="hiddenInput" id="hiddenInput" />
+                
+
+                <div class="form-group">
+                    <label for="cpf">CPF</label>
+                    <input type="text" id="cpfColaborador" value="{{cpf}}" class="form-control cpf" name="cpf" disabled>
+                </div>
+
+                <label for="equipamento">Equipamento</label>
+                <select name="equipamento" id="dropdownEquip" class="form-control form-group col-md-12" onchange="changeHiddenInputEquip(this)" required>
+                    <option selected>Selecione o equipamento</option>
+                    {% for equipamento in equipamentos %}
+                        <option value={{equipamento.nome}}>{{equipamento.nome}}</option>
+                    {% endfor %}
+                </select>         
+                <input type="hidden" name="hiddenInputEquip" id="hiddenInputEquip" />
+                <input type="hidden" name="hiddenInputEquip" id="hiddenInputEquip" />
+
+                <div class="row">
+                    <div class="form-group col-md-8">
+                        <label for="quantidade">Quantidade</label>
+                        <input type="number" id="quantidadeEquipamento" class="form-control" name="quantidade" required>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="quantidade">Disponivel</label>
+                        <input type="number" id="quantidadeDisponivel" value="{{equipamento.quantidade}}" max="{{equipamento.quantidade}}" class="form-control" name="quantidadeDisponivel" disabled>
+                    </div>
+                        
+                    <div id="minhaDiv" display="none" class="mt-2 ml-3 mr-3 form-group alert alert-danger" role="alert">
+                        Quantidade maior que a disponivel.
+                      </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="Assinatura">Assinaturas</label>
+
+                    <div class="form-group" >
+                        <button type="button" class="btn btn-primary" required>
+                            <span class="text">Assinatura do responsavel</span>
+                        </button>
+                    </div>
+
+                    <div class="form-group mt-2" >
+                        <button type="button" class="btn btn-secondary" required>
+                            <span class="text">Assinatura do colaborador</span>
+                        </button>
+                    </div>
+
+                </div>
+
+                <div class="footer">
+                    <hr>
+                    <div class="d-flex justify-content-center row">
+                        <div class="col-12 col-md-3 text-center">
+                            <button type="submit" class="btn btn-success btn-icon-split">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                                <span class="text">Criar Emprestimo</span>
+                            </button>
+                        </div>
+    
+                        <div class="col-12 col-md-3 text-center">
+                            <button type="reset" id="btnCancelar" class="btn btn-danger btn-icon-split">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-close"></i>
+                                </span>
+                                <span class="text">Cancelar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            
+        </div>
+    </div>
+</div>
+
+<script src={% static 'js/semantic.js' %}></script>
+
 {% endblock conteudo %}
+

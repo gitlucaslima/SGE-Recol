@@ -1,3 +1,4 @@
+import json
 from multiprocessing.sharedctypes import Value
 from timeit import repeat
 
@@ -5,6 +6,7 @@ from django.contrib import messages
 from django.contrib.auth import login as login_check
 from django.contrib.auth import logout as logout_django
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from validate_docbr import CPF
 
@@ -111,7 +113,6 @@ def index(request):
 
     # Equipamentos disponiveis
     e_dispo = Equipamento.objects.filter(status='Disponivel').count()
-
 
     context['e_dispo'] = e_dispo
 
@@ -511,7 +512,28 @@ def deletarEquipamento(request):
 
 @login_required
 def novoEmprestimo(request):
-    return render(request, template_name='emprestimo/novoEmprestimo.html')
+    context={}
+
+    colaboradores = Colaborador.objects.all()
+    equipamentos = Equipamento.objects.all()
+    context['colaboradores'] = colaboradores
+    context['equipamentos'] = equipamentos
+
+    if request.method == "POST":
+        colaborador = request.POST.get("colaborador")
+        equipamento = request.POST.get("equipamento")
+        quantidade = request.POST.get("quantidade")
+
+        print(colaborador)
+        print(equipamento)
+        print(quantidade)
+        print(request.body)
+
+
+
+
+
+    return render(request, template_name='emprestimo/novoEmprestimo.html', context=context)
 
 @login_required
 def encerrarEmprestimo(request):

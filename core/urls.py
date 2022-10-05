@@ -25,7 +25,6 @@ urlpatterns = [
     path('deletarUsuario/', deletarUsuario, name='deletarUsuario'),
     path('editarUsuario/', editarUsuario, name='editarUsuario'),
 
-
-
+    path('novoEmprestimo/', novoEmprestimo, name='novoEmprestimo'),
 
 ]

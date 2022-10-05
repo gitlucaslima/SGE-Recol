@@ -6,7 +6,6 @@ from django.contrib.messages import constants as messages
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
@@ -17,7 +16,6 @@ SECRET_KEY = 'django-insecure-0cg*%t#d=s7g4^tl&1$_$5rh0g$0up0@_604(6g+-n()$=t$)%
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -30,7 +28,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'cpf_field',
     'core',
-
 ]
 
 MIDDLEWARE = [
@@ -63,7 +60,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'SGE.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
@@ -92,7 +88,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
@@ -104,7 +99,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
@@ -112,7 +106,7 @@ STATIC_URL = 'staticfiles/'
 STATIC_ROOT = 'staticfiles'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'core/static')
+    os.path.join(BASE_DIR, 'static')
 ]
 
 #Configuração autenticação
@@ -132,6 +126,5 @@ MESSAGE_TAGS = {
         messages.WARNING: 'alert-warning',
         messages.ERROR: 'alert-danger',
  }
-
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')

@@ -109,7 +109,7 @@ class Usuario(User):
 
 class Emprestimo(models.Model):
     colaborador = models.ForeignKey(Colaborador, 
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         null=False,
         blank=False,
     )
@@ -128,7 +128,7 @@ class Emprestimo(models.Model):
 
     emprestimo_equipamento = models.ForeignKey(
         Equipamento,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         null=False,
         blank=False,
     )
