@@ -71,7 +71,7 @@ def registrar(request):
 
             novo_usuario = Usuario()
             novo_usuario.email = email
-            novo_usuario.setor = setor
+            novo_usuario.setor = setor+'-ADM'
             novo_usuario.username = nome
             novo_usuario.status = 1
             novo_usuario.set_password(senha)
@@ -528,33 +528,33 @@ def novoEmprestimo(request):
         print(colaborador)
         print(nomeEquipamento)
         print(quantidade)
-        if(dataDevolucao):
-            print(dataDevolucao)
-        print(request.body)
 
         colaboradorRequisitante = Colaborador.objects.filter(cpf=colaborador).first()
         equipamentoEmprestimo = Equipamento.objects.filter(nome=nomeEquipamento).first()
 
         novoEmprestimo = Emprestimo()
 
+        # Cadastro do colaborador requisitante do emprestimo
         novoEmprestimo.colaborador = colaboradorRequisitante
 
         # Emprestimo aberto no dia da solicittação
         novoEmprestimo.data_criacao = date.today()
         novoEmprestimo.emprestimo_equipamento = equipamentoEmprestimo
+
+        # Decrementação da quantidade no estoque do equipamento
         equipamentoEmprestimo.quantidade = equipamentoEmprestimo.quantidade-int(quantidade)
 
+        # Alteração status do equipamento
+        equipamentoEmprestimo.status = "Emprestado"
 
-        # Emprestimo 1 de validade
+        if(dataDevolucao):
+            novoEmprestimo.data_encerramento = dataDevolucao
+            print(novoEmprestimo.data_criacao)
+            print(novoEmprestimo.data_encerramento)
+
+        # Emprestimo 1 ano de validade se não especificado data de devolução
         novoEmprestimo.data_encerramento = novoEmprestimo.data_criacao + timedelta(365)
-
-
-
-
-
         print('----------------------')
-
-
 
     return render(request, template_name='emprestimo/novoEmprestimo.html', context=context)
 

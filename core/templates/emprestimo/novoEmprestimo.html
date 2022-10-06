@@ -46,7 +46,7 @@
                 <div class="row">
                     <div class="form-group col-md-8">
                         <label for="quantidade">Quantidade</label>
-                        <input type="number" id="quantidadeEquipamento" class="form-control" name="quantidade" required>
+                        <input type="number" id="quantidadeEquipamento" min="1" max="{{equipamento.quantidade}}"  class="form-control" name="quantidade" required>
                     </div>
                     <div class="form-group col-md-4">
                         <label for="quantidade">Disponivel</label>
@@ -75,13 +75,23 @@
                     <label for="Assinatura">Assinaturas</label>
 
                     <div class="form-group" >
-                        <button type="button" class="btn btn-primary" required>
+                        <button type="button" 
+                        class="btn btn-primary" 
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalCadastrarAssinaturaResponsavel"
+                        data-bs-whatever="@mdo" 
+                        required>
                             <span class="text">Assinatura do responsavel</span>
                         </button>
                     </div>
 
                     <div class="form-group mt-2" >
-                        <button type="button" class="btn btn-secondary" required>
+                        <button type="button" 
+                        class="btn btn-secondary" 
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalCadastrarAssinaturaColaborador"
+                        data-bs-whatever="@mdo" 
+                        required>
                             <span class="text">Assinatura do colaborador</span>
                         </button>
                     </div>
@@ -111,7 +121,10 @@
                     </div>
                 </div>
             </form>
-            
+
+            {% include 'modais/cadastrarAssinaturaResponsavelModal.html' %}
+            {% include 'modais/cadastrarAssinaturaColaboradorModal.html' %}
+
         </div>
     </div>
 </div>

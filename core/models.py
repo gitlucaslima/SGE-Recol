@@ -123,7 +123,13 @@ class Emprestimo(models.Model):
     data_encerramento = models.DateField(
         auto_now=False,
         null=False,
-        blank=False,
+        blank=True,
+    )
+
+    data_devolução = models.DateField(
+        auto_now=True,
+        null=False,
+        blank=True,
     )
 
     emprestimo_equipamento = models.ForeignKey(
