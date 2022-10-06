@@ -522,20 +522,18 @@ def novoEmprestimo(request):
         colaborador = request.POST.get("colaborador")
         nomeEquipamento = request.POST.get("nomeEquipamento")
         quantidade = request.POST.get("quantidade")
+        dataDevolucao = request.POST.get("data")
 
         print('-----------Dados do POST-----------')
         print(colaborador)
         print(nomeEquipamento)
         print(quantidade)
-        print('----------------------')
+        if(dataDevolucao):
+            print(dataDevolucao)
+        print(request.body)
 
-
-        print('-----------Dados do Emprestimo-----------')
         colaboradorRequisitante = Colaborador.objects.filter(cpf=colaborador).first()
         equipamentoEmprestimo = Equipamento.objects.filter(nome=nomeEquipamento).first()
-
-        print(colaboradorRequisitante.nome)
-        print(equipamentoEmprestimo)
 
         novoEmprestimo = Emprestimo()
 
@@ -543,14 +541,12 @@ def novoEmprestimo(request):
 
         # Emprestimo aberto no dia da solicittação
         novoEmprestimo.data_criacao = date.today()
-        equipamentoEmprestimo.quantidade = equipamentoEmprestimo.quantidade-int(quantidade)
         novoEmprestimo.emprestimo_equipamento = equipamentoEmprestimo
+        equipamentoEmprestimo.quantidade = equipamentoEmprestimo.quantidade-int(quantidade)
+
 
         # Emprestimo 1 de validade
         novoEmprestimo.data_encerramento = novoEmprestimo.data_criacao + timedelta(365)
-        print(novoEmprestimo.data_criacao)
-        print(novoEmprestimo.data_encerramento)
-        print(equipamentoEmprestimo.quantidade)
 
 
 

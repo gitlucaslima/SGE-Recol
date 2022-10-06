@@ -13,12 +13,12 @@
         {% include 'alerts/messages.html' %}
         
         <div class="card-body">
-            <form action="{% url 'novoEmprestimo'%}" id="form-novoEmprestimo" method="post">
+            <form action="{% url 'novoEmprestimo'%}" class="needs-validation" id="form-novoEmprestimo" method="post">
 
             {% csrf_token %}
                 <label for="colaborador">Colaborador</label>
-                <select name="colaborador" id="dropdown" class="form-control form-group col-md-12" onchange="changeHiddenInput(this)" >
-                    <option selected>Selecione um colaborador</option>
+                <select name="colaborador" id="dropdown" class="form-control form-group col-md-12" onchange="changeHiddenInput(this)"  required>
+                    <option value="" selected>Selecione um colaborador</option>
                     {% for colaborador in colaboradores %}
                         <option value={{colaborador.cpf}}>{{colaborador}}</option>
                     {% endfor %}
@@ -31,13 +31,15 @@
                     <input type="text" id="cpfColaborador" value="{{cpf}}" class="form-control cpf" name="cpf" disabled>
                 </div>
 
-                <label for="equipamento">Equipamento</label>
-                <select name="equipamento" id="dropdownEquip" class="form-control form-group col-md-12" placeholder='Nenhum valor selecionado...' onchange="changeHiddenInputEquip(this)" required>
-                    <option selected>Selecione um equipamento</option>
-                    {% for equipamento in equipamentos %}
-                        <option value={{equipamento.quantidade}}>{{equipamento}}</option>
-                    {% endfor %}
-                </select>
+                <div class="form-group mt-3">
+                    <label for="equipamento">Equipamento</label>
+                    <select name="equipamento" id="dropdownEquip" class="form-control form-group col-md-12" placeholder='Nenhum valor selecionado...' onchange="changeHiddenInputEquip(this)" required>
+                        <option value="" selected>Selecione um equipamento</option>
+                        {% for equipamento in equipamentos %}
+                            <option value={{equipamento.quantidade}}>{{equipamento}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
                 <input type="hidden" name="hiddenInputEquip" id="hiddenInputEquip"/>
 
@@ -57,6 +59,17 @@
                         Quantidade maior que a disponivel.
                       </div>
                 </div>
+
+                <div class="form-group mt-3 col-md-12">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked>
+                        <label class="form-check-label" for="flexSwitchCheckChecked">Data de devolução indeterminada</label>
+                    </div>
+                     <div id="divDate" style="display:none">
+                        <input type="date" name="data" id="inputDate" class="form-control">
+                    </div>
+                </div>
+                
 
                 <div class="form-group">
                     <label for="Assinatura">Assinaturas</label>

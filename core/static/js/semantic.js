@@ -5,11 +5,31 @@ var minhadiv = document.getElementById("minhaDiv");
 var quantiRequirida = document.getElementById("quantidadeEquipamento");
 var btnCancelar = document.getElementById("btnCancelar");
 var drop = document.getElementById("dropdownEquip");
+var checkbox = document.getElementById("flexSwitchCheckChecked")
+var divinput = document.getElementById("divDate")
+var inputDate = document.getElementById("inputDate")
+
+
+function carregarInput(){
+    console.log(checkbox)
+    if(checkbox.checked){
+        divinput.parentNode.removeChild(divinput)
+    }
+    else{
+        divinput.style.display = "block";
+        inputDate.setAttribute("required", "")
+        console.log(inputDate)
+
+    }
+}
+
+checkbox.addEventListener('change', carregarInput)
 
 minhadiv.style.display = "none";
 
-btnCancelar.addEventListener("click", function () {
+btnCancelar.addEventListener("click", function (a) {
     minhadiv.style.display = "none";
+    cpf.setAttribute("value", "");
 });
 
 function changeHiddenInput (objDropDown)
@@ -27,13 +47,11 @@ function changeHiddenInputEquip (objDropDown)
    quanti.setAttribute("value", equip);
    nomeEquipamento.setAttribute("value", texto)
 
-   console.log(nomeEquipamento)
-
 }
 
 quantiRequirida.addEventListener('change', updateValue);
 
-function updateValue(e) {
+function updateValue() {
     var quantidade1 = Number(quantiRequirida.value);
     var quantidade2 = Number(quanti.value);
 
