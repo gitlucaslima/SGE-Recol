@@ -105,6 +105,11 @@ USE_TZ = True
 STATIC_URL = 'staticfiles/'
 STATIC_ROOT = 'staticfiles'
 
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "core/static")
 ]
@@ -127,4 +132,3 @@ MESSAGE_TAGS = {
         messages.ERROR: 'alert-danger',
  }
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')

@@ -8,7 +8,9 @@ var drop = document.getElementById("dropdownEquip");
 var checkbox = document.getElementById("flexSwitchCheckChecked")
 var divinput = document.getElementById("divDate")
 var inputDate = document.getElementById("inputDate")
-
+var iconeColab = document.getElementById("iconeColab")
+var iconeRespo = document.getElementById("iconeRespo")
+var assinaturaResponsavel = document.getElementById("assinaturaResponsavel")
 
 function carregarInput(){
     console.log(checkbox)
@@ -30,6 +32,11 @@ checkbox.addEventListener('change', carregarInput)
 minhadiv.style.display = "none";
 
 btnCancelar.addEventListener("click", function (a) {
+    var colab = document.getElementById("colab");
+    var respo = window.document.getElementById("respo");
+
+    colab.src = "https://st2.depositphotos.com/5007459/8489/v/450/depositphotos_84895786-stock-illustration-writing-hand.jpg"
+    respo.src = "https://st2.depositphotos.com/5007459/8489/v/450/depositphotos_84895786-stock-illustration-writing-hand.jpg"
     minhadiv.style.display = "none";
     cpf.setAttribute("value", "");
 });
@@ -56,9 +63,6 @@ quantiRequirida.addEventListener('change', updateValue);
 function updateValue() {
     var quantidade1 = Number(quantiRequirida.value);
     var quantidade2 = Number(quanti.value);
-
-    console.log(quantidade1)
-    console.log(quantidade2)
 
     if(quantidade1 > quantidade2){
         minhadiv.style.display = "block";

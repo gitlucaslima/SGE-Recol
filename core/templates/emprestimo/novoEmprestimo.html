@@ -56,9 +56,12 @@
 
                     <input type="hidden" name="nomeEquipamento" value="nome" id="nomeEquipamento"/>
 
-                    <div id="minhaDiv" display="none" class="mt-2 ml-3 mr-3 form-group alert alert-danger" role="alert">
-                        Quantidade maior que a disponivel.
-                      </div>
+                    <div id="minhaDiv" display="none" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Erro!</strong> Quantidade indisponivel
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="form-group mt-3 col-md-12">
@@ -70,13 +73,14 @@
                         <input type="date" name="data" id="inputDate" class="form-control">
                     </div>
                 </div>
-                
 
                 <div class="form-group mt-3">
                     <label for="Assinatura">Assinaturas</label>
 
-                    <div class="form-group" >
-                        <button type="button" 
+                    <div class="form-group mt-2 col-md-12" >
+                        <div class="row">
+                            <div class="col">
+                                <button type="button" 
                         class="btn btn-primary" 
                         data-bs-toggle="modal"
                         data-bs-target="#modalCadastrarAssinaturaResponsavel"
@@ -84,13 +88,17 @@
                         required>
                             <span class="text">Assinatura do responsavel</span>
                         </button>
-                        <input type="hidden" id="assinaturaResponsavel" name="assinaturaResponsavel" required/>
-                        <i class="fas fa-check"></i>
-
+                                <input type="hidden" id="assinaturaResponsavel" name="assinaturaResponsavel" required/>
+                                <img src="https://st2.depositphotos.com/5007459/8489/v/450/depositphotos_84895786-stock-illustration-writing-hand.jpg" id="respo" alt="Assinatura" style="height:5rem; width:10rem">
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="form-group mt-2" >
-                        <button type="button" 
+                    <div class="form-group mt-2 col-md-12" >
+                        
+                        <div class="d-flex row">
+                            <div class="col">
+                                <button type="button" 
                         class="btn btn-secondary" 
                         data-bs-toggle="modal"
                         data-bs-target="#modalCadastrarAssinaturaColaborador"
@@ -98,10 +106,10 @@
                         required>
                             <span class="text">Assinatura do colaborador</span>
                         </button>
-                        <input type="hidden" id="assinaturaColaborador" name="assinaturaColaborador" required/>
-                        <i class="fas fa-check"></i>
-
-
+                                <input type="hidden" id="assinaturaColaborador" name="assinaturaColaborador" required/>
+                                <img src="https://st2.depositphotos.com/5007459/8489/v/450/depositphotos_84895786-stock-illustration-writing-hand.jpg" id="colab" alt="Assinatura" style="height:5rem; width:10rem">
+                            </div>
+                        </div>
                     </div>
 
                 </div>

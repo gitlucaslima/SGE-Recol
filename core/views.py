@@ -1,15 +1,13 @@
-import json
-from multiprocessing.sharedctypes import Value
-from timeit import repeat
 
 from django.contrib import messages
 from django.contrib.auth import login as login_check
 from django.contrib.auth import logout as logout_django
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from validate_docbr import CPF
 from datetime import date, timedelta
+
+from PIL import Image
 
 from core.models import *
 
@@ -526,17 +524,6 @@ def novoEmprestimo(request):
         assinaturaColaborador = request.POST.get("assinaturaColaborador")
         assinaturaResponsavel = request.POST.get("assinaturaResponsavel")
 
-
-        print('-----------Dados do POST-----------')
-        print(colaborador)
-        print(nomeEquipamento)
-        print(quantidade)
-        print(">>>>>>>>>>>>>>>>>>>>>")
-        print("assinaturaResponsavel")
-        print(assinaturaResponsavel)
-        print("assinaturaResponsavel")
-        print(assinaturaColaborador)
-
         colaboradorRequisitante = Colaborador.objects.filter(cpf=colaborador).first()
         equipamentoEmprestimo = Equipamento.objects.filter(nome=nomeEquipamento).first()
 
@@ -557,12 +544,16 @@ def novoEmprestimo(request):
 
         if(dataDevolucao):
             novoEmprestimo.data_encerramento = dataDevolucao
-            print(novoEmprestimo.data_criacao)
-            print(novoEmprestimo.data_encerramento)
 
         # Emprestimo 1 ano de validade se não especificado data de devolução
         novoEmprestimo.data_encerramento = novoEmprestimo.data_criacao + timedelta(365)
-        print('----------------------')
+
+        assiRespo = Image.open(assinaturaResponsavel)
+
+        print(assiRespo)
+        
+
+
 
     return render(request, template_name='emprestimo/novoEmprestimo.html', context=context)
 
