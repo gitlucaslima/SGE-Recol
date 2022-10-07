@@ -13,7 +13,9 @@ var inputDate = document.getElementById("inputDate")
 function carregarInput(){
     console.log(checkbox)
     if(checkbox.checked){
-        divinput.parentNode.removeChild(divinput)
+        divinput.style.display = "none";
+        inputDate.removeAttribute("required")
+
     }
     else{
         divinput.style.display = "block";
@@ -62,7 +64,7 @@ function updateValue() {
         minhadiv.style.display = "block";
         setTimeout(function() {
             $('minhadiv').fadeOut('slow');
-        }, 3000);
+        }, 1000);
     }
     
 }

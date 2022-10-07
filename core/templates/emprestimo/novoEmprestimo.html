@@ -13,7 +13,7 @@
         {% include 'alerts/messages.html' %}
         
         <div class="card-body">
-            <form action="{% url 'novoEmprestimo'%}" class="needs-validation" id="form-novoEmprestimo" method="post">
+            <form target="_parent" action="{% url 'novoEmprestimo'%}" class="needs-validation" id="form-novoEmprestimo" method="post" enctype="multipart/form-data">
 
             {% csrf_token %}
                 <label for="colaborador">Colaborador</label>
@@ -22,7 +22,8 @@
                     {% for colaborador in colaboradores %}
                         <option value={{colaborador.cpf}}>{{colaborador}}</option>
                     {% endfor %}
-                </select>         
+                </select>
+
                 <input type="hidden" name="hiddenInput" id="hiddenInput" />
                 
 
@@ -71,7 +72,7 @@
                 </div>
                 
 
-                <div class="form-group">
+                <div class="form-group mt-3">
                     <label for="Assinatura">Assinaturas</label>
 
                     <div class="form-group" >
@@ -83,6 +84,9 @@
                         required>
                             <span class="text">Assinatura do responsavel</span>
                         </button>
+                        <input type="hidden" id="assinaturaResponsavel" name="assinaturaResponsavel" required/>
+                        <i class="fas fa-check"></i>
+
                     </div>
 
                     <div class="form-group mt-2" >
@@ -94,6 +98,10 @@
                         required>
                             <span class="text">Assinatura do colaborador</span>
                         </button>
+                        <input type="hidden" id="assinaturaColaborador" name="assinaturaColaborador" required/>
+                        <i class="fas fa-check"></i>
+
+
                     </div>
 
                 </div>

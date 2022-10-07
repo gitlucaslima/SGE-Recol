@@ -523,11 +523,19 @@ def novoEmprestimo(request):
         nomeEquipamento = request.POST.get("nomeEquipamento")
         quantidade = request.POST.get("quantidade")
         dataDevolucao = request.POST.get("data")
+        assinaturaColaborador = request.POST.get("assinaturaColaborador")
+        assinaturaResponsavel = request.POST.get("assinaturaResponsavel")
+
 
         print('-----------Dados do POST-----------')
         print(colaborador)
         print(nomeEquipamento)
         print(quantidade)
+        print(">>>>>>>>>>>>>>>>>>>>>")
+        print("assinaturaResponsavel")
+        print(assinaturaResponsavel)
+        print("assinaturaResponsavel")
+        print(assinaturaColaborador)
 
         colaboradorRequisitante = Colaborador.objects.filter(cpf=colaborador).first()
         equipamentoEmprestimo = Equipamento.objects.filter(nome=nomeEquipamento).first()
