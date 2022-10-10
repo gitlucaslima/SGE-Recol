@@ -1,15 +1,18 @@
 
+import base64
+from datetime import date, timedelta
+from os import name
+
 from django.contrib import messages
 from django.contrib.auth import login as login_check
 from django.contrib.auth import logout as logout_django
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
-from validate_docbr import CPF
-from datetime import date, timedelta
-
 from PIL import Image
+from validate_docbr import CPF
 
 from core.models import *
+from core.utils import retornaData, saveMedia
 
 
 def login(request):
@@ -524,6 +527,7 @@ def novoEmprestimo(request):
         assinaturaColaborador = request.POST.get("assinaturaColaborador")
         assinaturaResponsavel = request.POST.get("assinaturaResponsavel")
 
+        responsavel = Usuario.objects.filter(first_name=request.user).first()
         colaboradorRequisitante = Colaborador.objects.filter(cpf=colaborador).first()
         equipamentoEmprestimo = Equipamento.objects.filter(nome=nomeEquipamento).first()
 
@@ -536,11 +540,15 @@ def novoEmprestimo(request):
         novoEmprestimo.data_criacao = date.today()
         novoEmprestimo.emprestimo_equipamento = equipamentoEmprestimo
 
-        # Decrementação da quantidade no estoque do equipamento
-        equipamentoEmprestimo.quantidade = equipamentoEmprestimo.quantidade-int(quantidade)
+        equipamentos = Equipamento.objects.filter(nome=nomeEquipamento).first()
+        # print(equipamentos.n_serie)
 
+        # Decrementação da quantidade no estoque do equipamento
+        equipamentos.quantidade = equipamentoEmprestimo.quantidade-int(quantidade)
+        print(equipamentos.quantidade)
+       
         # Alteração status do equipamento
-        equipamentoEmprestimo.status = "Emprestado"
+        equipamentos.status = "Emprestado"
 
         if(dataDevolucao):
             novoEmprestimo.data_encerramento = dataDevolucao
@@ -548,12 +556,25 @@ def novoEmprestimo(request):
         # Emprestimo 1 ano de validade se não especificado data de devolução
         novoEmprestimo.data_encerramento = novoEmprestimo.data_criacao + timedelta(365)
 
-        assiRespo = Image.open(assinaturaResponsavel)
+        # Converter assinatura Responsavel
+        ar = retornaData(assinaturaResponsavel) 
 
-        print(assiRespo)
-        
+        # Converter assinatura Colaborador
+        ac = retornaData(assinaturaColaborador)
 
+        # Nomeando as assinaturas
+        nomeRespo = request.user
+        nomeColab = colaboradorRequisitante.nome
 
+        #write the decoded data back to original format in  file
+        urlRespoAssi = saveMedia(ar, nomeRespo)
+        urlColabAssi = saveMedia(ac, nomeColab)
+
+        novoEmprestimo.assinatura_responsavel = urlRespoAssi
+        novoEmprestimo.assinatura_colaborador = urlColabAssi
+
+        novoEmprestimo.save()
+        equipamentos.save()
 
     return render(request, template_name='emprestimo/novoEmprestimo.html', context=context)
 
