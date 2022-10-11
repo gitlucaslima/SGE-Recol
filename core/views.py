@@ -515,14 +515,17 @@ def novoEmprestimo(request):
     context={}
 
     colaboradores = Colaborador.objects.all()
-    equipamentos = Equipamento.objects.all()
+    emprestimos = Emprestimo.objects.all()
+    equipamentos = Equipamento.objects.filter(status="Disponivel")
     context['colaboradores'] = colaboradores
     context['equipamentos'] = equipamentos
+    context['emprestimos'] = emprestimos
+
 
     if request.method == "POST":
         colaborador = request.POST.get("colaborador")
         nomeEquipamento = request.POST.get("nomeEquipamento")
-        quantidade = request.POST.get("quantidade")
+        quantidade = int(request.POST.get("quantidade"))
         dataDevolucao = request.POST.get("data")
         assinaturaColaborador = request.POST.get("assinaturaColaborador")
         assinaturaResponsavel = request.POST.get("assinaturaResponsavel")
@@ -541,11 +544,14 @@ def novoEmprestimo(request):
         novoEmprestimo.emprestimo_equipamento = equipamentoEmprestimo
 
         equipamentos = Equipamento.objects.filter(nome=nomeEquipamento).first()
-        # print(equipamentos.n_serie)
 
-        # Decrementação da quantidade no estoque do equipamento
+        if(equipamentos.quantidade < quantidade):
+            messages.add_message(request, messages.ERROR,
+                                 'Quantidade solicitada indisponivel')
+            return render(request, template_name='emprestimo/novoEmprestimo.html', context=context)
+
+        # Decrementação da quantidade no estoque do equipamento            
         equipamentos.quantidade = equipamentoEmprestimo.quantidade-int(quantidade)
-        print(equipamentos.quantidade)
        
         # Alteração status do equipamento
         equipamentos.status = "Emprestado"
@@ -573,8 +579,16 @@ def novoEmprestimo(request):
         novoEmprestimo.assinatura_responsavel = urlRespoAssi
         novoEmprestimo.assinatura_colaborador = urlColabAssi
 
-        novoEmprestimo.save()
-        equipamentos.save()
+    
+        try:
+            novoEmprestimo.save()
+            equipamentos.save()
+
+            messages.add_message(request, messages.SUCCESS,
+                                 'Emprestimo realizado com sucesso')
+        except Exception as Error:
+            messages.add_message(
+                    request, messages.ERROR, 'Não foi possivel realizar o emprestimo')
 
     return render(request, template_name='emprestimo/novoEmprestimo.html', context=context)
 
