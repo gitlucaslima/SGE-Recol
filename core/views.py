@@ -112,8 +112,10 @@ def index(request):
 
     # Equipamentos disponiveis
     e_dispo = Equipamento.objects.filter(status='Disponivel').count()
+    emprestimos = Emprestimo.objects.all()
 
     context['e_dispo'] = e_dispo
+    context['emprestimos'] = emprestimos
 
     return render(request, template_name='base.html', context=context)
 
@@ -515,17 +517,15 @@ def novoEmprestimo(request):
     context={}
 
     colaboradores = Colaborador.objects.all()
-    emprestimos = Emprestimo.objects.all()
     equipamentos = Equipamento.objects.filter(status="Disponivel")
     context['colaboradores'] = colaboradores
     context['equipamentos'] = equipamentos
-    context['emprestimos'] = emprestimos
 
 
     if request.method == "POST":
         colaborador = request.POST.get("colaborador")
         nomeEquipamento = request.POST.get("nomeEquipamento")
-        quantidade = int(request.POST.get("quantidade"))
+        quantidade = request.POST.get("quantidade")
         dataDevolucao = request.POST.get("data")
         assinaturaColaborador = request.POST.get("assinaturaColaborador")
         assinaturaResponsavel = request.POST.get("assinaturaResponsavel")
@@ -541,25 +541,25 @@ def novoEmprestimo(request):
 
         # Emprestimo aberto no dia da solicittação
         novoEmprestimo.data_criacao = date.today()
-        novoEmprestimo.emprestimo_equipamento = equipamentoEmprestimo
 
-        equipamentos = Equipamento.objects.filter(nome=nomeEquipamento).first()
-
-        if(equipamentos.quantidade < quantidade):
+        if(equipamentoEmprestimo.quantidade < int(quantidade)):
             messages.add_message(request, messages.ERROR,
                                  'Quantidade solicitada indisponivel')
             return render(request, template_name='emprestimo/novoEmprestimo.html', context=context)
 
+        novoEmprestimo.emprestimo_equipamento = equipamentoEmprestimo
+
         # Decrementação da quantidade no estoque do equipamento            
-        equipamentos.quantidade = equipamentoEmprestimo.quantidade-int(quantidade)
+        equipamentoEmprestimo.quantidade = equipamentoEmprestimo.quantidade-int(quantidade)
+        
+        novoEmprestimo.emprestimo_equipamento.quantidade = quantidade
        
         # Alteração status do equipamento
         equipamentos.status = "Emprestado"
 
         if(dataDevolucao):
-            novoEmprestimo.data_encerramento = dataDevolucao
+            novoEmprestimo.data_devolucao = dataDevolucao
 
-        # Emprestimo 1 ano de validade se não especificado data de devolução
         novoEmprestimo.data_encerramento = novoEmprestimo.data_criacao + timedelta(365)
 
         # Converter assinatura Responsavel
@@ -581,12 +581,14 @@ def novoEmprestimo(request):
 
     
         try:
+            equipamentoEmprestimo.save()
             novoEmprestimo.save()
-            equipamentos.save()
+
 
             messages.add_message(request, messages.SUCCESS,
                                  'Emprestimo realizado com sucesso')
         except Exception as Error:
+            print(Error)
             messages.add_message(
                     request, messages.ERROR, 'Não foi possivel realizar o emprestimo')
 

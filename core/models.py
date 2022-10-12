@@ -126,9 +126,8 @@ class Emprestimo(models.Model):
         blank=True,
     )
 
-    data_devolução = models.DateField(
-        auto_now=True,
-        null=False,
+    data_devolucao = models.DateField(
+        null=True,
         blank=True,
     )
 
@@ -150,14 +149,15 @@ class Emprestimo(models.Model):
     )
 
     STATUS_EMPRESTIMO_CHOICES = (
-        ("0", "Atrasado"),
-        ("1", "Aberto"),
-        ("2", "Encerrado"),
+        ("Atrasado", "Atrasado"),
+        ("Aberto", "Aberto"),
+        ("Encerrado", "Encerrado"),
     )
 
-    status_emprestimo = models.IntegerField(
+    status_emprestimo = models.CharField(
         choices = STATUS_EMPRESTIMO_CHOICES,
-        default = 1,
+        default = "Aberto",
+        max_length=100,
         blank=False,
         null = False,
     )

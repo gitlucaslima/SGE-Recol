@@ -206,7 +206,7 @@
                                     <th>Equipamento</th>
                                     <th>Quantidade</th>
                                     <th>Criação do Emprestimo</th>
-                                    <th>Data de Devolução</th>
+                                    <th>Data para devolução</th>
                                     <th>Data de Encerramento</th>
                                 </thead>
                                 <tfoot>
@@ -215,19 +215,23 @@
                                     <th>Equipamento</th>
                                     <th>Quantidade</th>
                                     <th>Criação do Emprestimo</th>
-                                    <th>Data de Devolução</th>
+                                    <th>Data para devolução</th>
                                     <th>Data de Encerramento</th>
                                 </tfoot>
                                 <tbody>
                                     {% for emprestimo in emprestimos %}
                                     <tr>
-                                        <tr>{{emprestimo.colaborador.nome}}</tr>
-                                        <tr>{{emprestimos.tatus_emprestimo}}</tr>
-                                        <tr>{{emprestimo_equipamento.nome}}</tr>
-                                        <tr>{{emprestimo_equipamento.quantidade}}</tr>
-                                        <tr>{{emprestimo.data_criacao}}</tr>
-                                        <tr>{{emprestimo.data_devolucao}}</tr>
-                                        <tr>{{emprestimo.data_encerramento}}</tr>
+                                        <td>{{emprestimo.colaborador.nome}}</td>
+                                        <td>{{emprestimo.status_emprestimo}}</td>
+                                        <td>{{emprestimo.emprestimo_equipamento.nome}}</td>
+                                        <td>{{emprestimo.emprestimo_equipamento.quantidade}}</td>
+                                        <td>{{emprestimo.data_criacao}}</td>
+                                        <td> {% if emprestimo.data_devolucao == None %}  
+                                                Indeterminada   
+                                            {% else %}
+                                            {{emprestimo.data_devolucao}}
+                                            {% endif %}</td>
+                                        <td>{{emprestimo.data_encerramento}}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
