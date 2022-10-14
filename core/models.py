@@ -28,23 +28,24 @@ class Equipamento(models.Model):
     )
 
     arquivo_foto = models.FileField(
-        ('Foto do objeto'), 
-        null=True, 
-        blank=True, 
-        upload_to='midias', 
+        ('Foto do objeto'),
+        null=True,
+        blank=True,
+        upload_to='midias',
         help_text='Tamanho máximo de 64MB'
     )
 
     STATUS_EQUIPAMENTO = (
-        ("D", "Disponivel"),
-        ("E", "Emprestado"),
-        ("I", "Indisponivel")
+        ("Disponivel", "Disponivel"),
+        ("Emprestado", "Emprestado"),
+        ("Indisponivel", "Indisponivel")
     )
 
-    status = models.CharField(max_length=1, choices=STATUS_EQUIPAMENTO, default="Disponivel", blank=False, null=True)
+    status = models.CharField(max_length=100, choices=STATUS_EQUIPAMENTO,
+                              default="Disponivel", blank=False, null=True)
 
     observacao = models.TextField(max_length=300)
-    
+
     def __str__(self):
         return self.nome
 
@@ -64,10 +65,10 @@ class Colaborador(models.Model):
     )
 
     cpf = CPFField('cpf',
-        null=False,
-        blank=False,
-        unique=True
-    )
+                   null=False,
+                   blank=False,
+                   unique=True
+                   )
 
     rg = models.CharField(
         max_length=9,
@@ -86,6 +87,7 @@ class Colaborador(models.Model):
     def __str__(self):
         return self.nome
 
+
 class Usuario(User):
     setor = models.CharField(
         max_length=100,
@@ -93,7 +95,7 @@ class Usuario(User):
         blank=False,
     )
 
-    STATUS_CHOICES =(
+    STATUS_CHOICES = (
         ("1", "Ativo"),
         ("0", "Inativo"),
     )
@@ -107,12 +109,13 @@ class Usuario(User):
     def __str__(self):
         return self.username
 
+
 class Emprestimo(models.Model):
-    colaborador = models.ForeignKey(Colaborador, 
-        on_delete=models.CASCADE,
-        null=False,
-        blank=False,
-    )
+    colaborador = models.ForeignKey(Colaborador,
+                                    on_delete=models.CASCADE,
+                                    null=False,
+                                    blank=False,
+                                    )
 
     data_criacao = models.DateField(
         auto_now=True,
@@ -138,12 +141,12 @@ class Emprestimo(models.Model):
         blank=False,
     )
 
-    assinatura_colaborador = models.ImageField(        
+    assinatura_colaborador = models.ImageField(
         null=False,
         blank=False,
     )
 
-    assinatura_responsavel = models.ImageField(        
+    assinatura_responsavel = models.ImageField(
         null=False,
         blank=False,
     )
@@ -155,13 +158,9 @@ class Emprestimo(models.Model):
     )
 
     status_emprestimo = models.CharField(
-        choices = STATUS_EMPRESTIMO_CHOICES,
-        default = "Aberto",
+        choices=STATUS_EMPRESTIMO_CHOICES,
+        default="Aberto",
         max_length=100,
         blank=False,
-        null = False,
+        null=False,
     )
-
-
-
-

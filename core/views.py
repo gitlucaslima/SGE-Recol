@@ -30,27 +30,28 @@ def login(request):
         if(not user):
 
             messages.add_message(request, messages.ERROR,
-                                "Login ou senha inválidos")
+                                 "Login ou senha inválidos")
             return redirect("login")
-        
+
         is_user = user.check_password(senha)
         is_active = user.status
 
         if(is_active == 0):
             messages.add_message(request, messages.INFO,
-                    "Usuario inativo, entre em contato com o administrador do sistema")
+                                 "Usuario inativo, entre em contato com o administrador do sistema")
             return redirect("login")
 
-        if(is_user and (is_active == 1) ):
+        if(is_user and (is_active == 1)):
             login_check(request, user)
 
             return render(request, template_name='base.html')
         else:
             messages.add_message(request, messages.ERROR,
-                                "Login ou senha inválidos")
+                                 "Login ou senha inválidos")
             return redirect("login")
 
     return render(request, template_name='accounts/login.html')
+
 
 def registrar(request):
 
@@ -76,7 +77,7 @@ def registrar(request):
             novo_usuario.username = nome
             novo_usuario.status = 1
             novo_usuario.set_password(senha)
-            
+
             try:
 
                 novo_usuario.save()
@@ -99,27 +100,43 @@ def registrar(request):
 
         return render(request, 'accounts/registro.html')
 
+
 def logout(request):
 
     logout_django(request)
 
     return redirect("login")
 
-@login_required 
+
+@login_required
 def index(request):
 
     context = {}
 
-    # Equipamentos disponiveis
-    e_dispo = Equipamento.objects.filter(status='Disponivel').count()
-    emprestimos = Emprestimo.objects.all()
+    # Equipamentos
+    e_disponivel = Equipamento.objects.filter(
+        status='Disponivel').count()  # disponiveis
+    e_emprestado = Equipamento.objects.filter(
+        status='Emprestado').count()  # disponiveis
 
-    context['e_dispo'] = e_dispo
+    # Emprestimos
+    emprestimos = Emprestimo.objects.all()  # todos
+    emp_aberto = Emprestimo.objects.filter(
+        status_emprestimo='Aberto').count()  # abertos
+    emp_fechado = Emprestimo.objects.filter(
+        status_emprestimo='Encerrado').count()  # abertos
+
+    context['e_dispo'] = e_disponivel
+    context['e_empr'] = e_emprestado
+
     context['emprestimos'] = emprestimos
+    context['emp_aberto'] = emp_aberto
+    context['emp_fechado'] = emp_fechado
 
     return render(request, template_name='base.html', context=context)
 
-@login_required 
+
+@login_required
 def cadastrarUsuario(request):
     if request.method == "GET":
 
@@ -141,7 +158,6 @@ def cadastrarUsuario(request):
         novoUsuario.set_password(senha)
         novoUsuario.setor = setor
 
-
         jaExisteNome = Usuario.objects.filter(username=nome).first()
         jaExisteEmail = Usuario.objects.filter(email=email).first()
 
@@ -152,7 +168,7 @@ def cadastrarUsuario(request):
             return render(request, template_name='usuarios/usuarios.html')
 
         try:
-            
+
             novoUsuario.is_staff = True
             novoUsuario.is_admin = True
             novoUsuario.is_superuser = True
@@ -168,80 +184,80 @@ def cadastrarUsuario(request):
 
         return render(request, template_name='usuarios/usuarios.html', context=context)
 
-@login_required 
+
+@login_required
 def deletarUsuario(request):
-        context = {}
+    context = {}
 
-        if request.method == "POST":
-            id = request.POST.get("id")
+    if request.method == "POST":
+        id = request.POST.get("id")
 
-            colaborador = get_object_or_404(Usuario, id=id)
+        colaborador = get_object_or_404(Usuario, id=id)
 
-            try:
-                colaborador.delete()
-                messages.add_message(request, messages.SUCCESS,
+        try:
+            colaborador.delete()
+            messages.add_message(request, messages.SUCCESS,
                                  "O usuario foi excluido com sucesso!")
-            
 
-            except ValueError:
-                messages.add_message(request, messages.ERROR,
+        except ValueError:
+            messages.add_message(request, messages.ERROR,
                                  "Não foi possivel excluir o usuario")
-                                 
 
-            usuarios = Usuario.objects.all()
-            context['usuarios'] = usuarios
-        
+        usuarios = Usuario.objects.all()
+        context['usuarios'] = usuarios
 
-        return render(request, template_name='usuarios/usuarios.html', context=context)
+    return render(request, template_name='usuarios/usuarios.html', context=context)
 
-@login_required 
+
+@login_required
 def editarUsuario(request):
+    context = {}
+
+    if request.method == "POST":
+        id = request.POST.get("id")
+        nome = request.POST.get("nome")
+        email = request.POST.get("email")
+        setor = request.POST.get("setor")
+        status = request.POST.get("status")
+
+        usuario = Usuario.objects.filter(id=int(id)).first()
+        usuario.username = nome
+        usuario.email = email
+        usuario.setor = setor
+        usuario.status = status
+
+        jaExisteNome = Usuario.objects.filter(username=nome).first()
+        jaExisteEmail = Usuario.objects.filter(email=email).first()
+
+        if(jaExisteNome and jaExisteEmail):
+            if(jaExisteNome.username != usuario.username or jaExisteEmail.email != usuario.email):
+                messages.add_message(
+                    request, messages.ERROR, 'Já existe um colaborador cadastrado')
+                return render(request, template_name='usuarios/usuarios.html', context=context)
+
+        try:
+            usuario.save()
+            messages.add_message(request, messages.SUCCESS,
+                                 'Registros atualizados com sucesso')
+        except:
+            messages.add_message(request, messages.ERROR, 'Ocorreu algum erro')
+
+        usuarios = Usuario.objects.all()
         context = {}
+        context['usuarios'] = usuarios
 
-        if request.method == "POST":
-            id = request.POST.get("id")
-            nome = request.POST.get("nome")
-            email = request.POST.get("email")
-            setor = request.POST.get("setor")
-            status = request.POST.get("status")
+    return render(request, template_name='usuarios/usuarios.html', context=context)
 
-            usuario = Usuario.objects.filter(id=int(id)).first()
-            usuario.username = nome
-            usuario.email = email
-            usuario.setor = setor
-            usuario.status = status
 
-            jaExisteNome = Usuario.objects.filter(username=nome).first()
-            jaExisteEmail = Usuario.objects.filter(email=email).first()
-
-            if(jaExisteNome and jaExisteEmail):
-                if(jaExisteNome.username != usuario.username or jaExisteEmail.email != usuario.email):
-                    messages.add_message(
-                        request, messages.ERROR, 'Já existe um colaborador cadastrado')
-                    return render(request, template_name='usuarios/usuarios.html', context=context)
-
-            try:
-                usuario.save()
-                messages.add_message(request, messages.SUCCESS,
-                                    'Registros atualizados com sucesso')
-            except:
-                messages.add_message(request, messages.ERROR, 'Ocorreu algum erro')
-
-            usuarios = Usuario.objects.all()
-            context = {}
-            context['usuarios'] = usuarios
-
-        return render(request, template_name='usuarios/usuarios.html', context=context)
-
-@login_required 
+@login_required
 def cadastrarColaborador(request):
-   
+
     if request.method == "GET":
 
         colaboradores = Colaborador.objects.all()
         context = {}
         context['colaboradores'] = colaboradores
-        
+
         return render(request, template_name='colaborador/colaborador.html', context=context)
 
     elif request.method == "POST":
@@ -250,7 +266,6 @@ def cadastrarColaborador(request):
         cpf = request.POST.get("cpf")
         setor = request.POST.get("setor")
         rg = request.POST.get("rg")
-
 
         novoColaborador = Colaborador()
         novoColaborador.nome = nome
@@ -262,8 +277,7 @@ def cadastrarColaborador(request):
         jaExisteNome = Colaborador.objects.filter(nome=nome)
         jaExisteCpf = Colaborador.objects.filter(cpf=cpf)
         jaEmail = Colaborador.objects.filter(email=email)
-        jaRg= Colaborador.objects.filter(rg=rg)
-
+        jaRg = Colaborador.objects.filter(rg=rg)
 
         colaboradores = Colaborador.objects.all()
         context = {}
@@ -273,7 +287,7 @@ def cadastrarColaborador(request):
         auxCpf = CPF()
         cpfValido = auxCpf.validate(cpf)
 
-        #se não for valido
+        # se não for valido
         if(cpfValido == False):
             messages.add_message(
                 request, messages.ERROR, 'Esse número de CPF é invalido')
@@ -289,9 +303,11 @@ def cadastrarColaborador(request):
             messages.add_message(request, messages.SUCCESS,
                                  'Colaborador cadastrado com sucesso')
         except ValueError as Error:
-            messages.add_message(request, messages.ERROR, 'Ocorreu algum erro {Error}')
+            messages.add_message(request, messages.ERROR,
+                                 'Ocorreu algum erro {Error}')
 
     return render(request, template_name='colaborador/colaborador.html', context=context)
+
 
 @login_required
 def deletarColaborador(request):
@@ -306,18 +322,16 @@ def deletarColaborador(request):
             colaborador.delete()
             messages.add_message(request, messages.SUCCESS,
                                  "O colaborador foi excluido com sucesso!")
-            
 
         except ValueError:
             messages.add_message(request, messages.ERROR,
                                  "Não foi possivel deletar o colaborador")
-                                 
 
         colaboradores = Colaborador.objects.all()
-        context['colaboradores'] =  colaboradores
-        
+        context['colaboradores'] = colaboradores
 
     return render(request, template_name='colaborador/colaborador.html', context=context)
+
 
 @login_required
 def editarColaborador(request):
@@ -330,7 +344,6 @@ def editarColaborador(request):
         cpf = request.POST.get("cpf")
         setor = request.POST.get("setor")
         rg = request.POST.get("rg")
-
 
         colaborador = Colaborador.objects.filter(id=int(id)).first()
         colaborador.nome = nome
@@ -347,7 +360,7 @@ def editarColaborador(request):
         auxCpf = CPF()
         cpfValido = auxCpf.validate(cpf)
 
-        #se não for valido
+        # se não for valido
         if(cpfValido == False):
             messages.add_message(
                 request, messages.ERROR, 'Esse número de CPF é invalido')
@@ -359,11 +372,11 @@ def editarColaborador(request):
         jaRg = Colaborador.objects.filter(rg=rg).first()
 
         if(jaExisteNome and jaExisteCpf and jaEmail and jaRg):
-            if(jaExisteNome.nome != colaborador.nome 
-            or jaExisteCpf.cpf != colaborador.cpf
-            or jaEmail.email != colaborador.email
-            or jaRg.rg != colaborador.rg
-            ):
+            if(jaExisteNome.nome != colaborador.nome
+               or jaExisteCpf.cpf != colaborador.cpf
+               or jaEmail.email != colaborador.email
+               or jaRg.rg != colaborador.rg
+               ):
                 messages.add_message(
                     request, messages.ERROR, 'Já existe um colaborador cadastrado')
                 return render(request, template_name='colaborador/colaborador.html', context=context)
@@ -374,9 +387,10 @@ def editarColaborador(request):
                                  'Registros atualizados com sucesso')
         except Exception as Error:
             messages.add_message(
-                    request, messages.ERROR, 'Já existe um colaborador cadastrado')
+                request, messages.ERROR, 'Já existe um colaborador cadastrado')
 
     return render(request, template_name='colaborador/colaborador.html', context=context)
+
 
 @login_required
 def cadastrarEquipamento(request):
@@ -388,7 +402,7 @@ def cadastrarEquipamento(request):
         context['equipamentos'] = equipamentos
 
         return render(request, template_name='equipamento/equipamento.html', context=context)
-    
+
     elif request.method == "POST":
 
         nome = request.POST.get("nome")
@@ -399,13 +413,11 @@ def cadastrarEquipamento(request):
 
         novoEquipamento = Equipamento()
 
-
         if(quantidade):
             novoEquipamento.quantidade = quantidade
         else:
             novoEquipamento.quantidade = 1
 
-            
         novoEquipamento.nome = nome
         novoEquipamento.n_serie = n_serie
         novoEquipamento.observacao = observacao
@@ -431,8 +443,8 @@ def cadastrarEquipamento(request):
 
             messages.add_message(request, messages.ERROR, 'Ocorreu algum erro')
 
-
     return render(request, template_name='equipamento/equipamento.html', context=context)
+
 
 @login_required
 def editarEquipamento(request):
@@ -473,17 +485,15 @@ def editarEquipamento(request):
             messages.add_message(request, messages.SUCCESS,
                                  "O equipamento foi atualizado com sucesso!")
 
-            
         except Exception as Error:
             messages.add_message(request, messages.ERROR,
                                  "Ocorreu um erro "+{Error})
-            
-        
+
         equipamentos = Equipamento.objects.all()
         context['equipamentos'] = equipamentos
 
-
     return render(request, template_name='equipamento/equipamento.html', context=context)
+
 
 @login_required
 def deletarEquipamento(request):
@@ -499,28 +509,25 @@ def deletarEquipamento(request):
             equipamento.delete()
             messages.add_message(request, messages.SUCCESS,
                                  "O equipamento foi excluido com sucesso!")
-            
 
         except ValueError:
             messages.add_message(request, messages.ERROR,
                                  "Não foi possivel deletar o equipamento")
-                                 
 
         equipamentos = Equipamento.objects.all()
         context['equipamentos'] = equipamentos
-        
 
     return render(request, template_name='equipamento/equipamento.html', context=context)
 
+
 @login_required
 def novoEmprestimo(request):
-    context={}
+    context = {}
 
     colaboradores = Colaborador.objects.all()
     equipamentos = Equipamento.objects.filter(status="Disponivel")
     context['colaboradores'] = colaboradores
     context['equipamentos'] = equipamentos
-
 
     if request.method == "POST":
         colaborador = request.POST.get("colaborador")
@@ -531,8 +538,10 @@ def novoEmprestimo(request):
         assinaturaResponsavel = request.POST.get("assinaturaResponsavel")
 
         responsavel = Usuario.objects.filter(first_name=request.user).first()
-        colaboradorRequisitante = Colaborador.objects.filter(cpf=colaborador).first()
-        equipamentoEmprestimo = Equipamento.objects.filter(nome=nomeEquipamento).first()
+        colaboradorRequisitante = Colaborador.objects.filter(
+            cpf=colaborador).first()
+        equipamentoEmprestimo = Equipamento.objects.filter(
+            nome=nomeEquipamento).first()
 
         novoEmprestimo = Emprestimo()
 
@@ -549,21 +558,23 @@ def novoEmprestimo(request):
 
         novoEmprestimo.emprestimo_equipamento = equipamentoEmprestimo
 
-        # Decrementação da quantidade no estoque do equipamento            
-        equipamentoEmprestimo.quantidade = equipamentoEmprestimo.quantidade-int(quantidade)
-        
+        # Decrementação da quantidade no estoque do equipamento
+        equipamentoEmprestimo.quantidade = equipamentoEmprestimo.quantidade - \
+            int(quantidade)
+
         novoEmprestimo.emprestimo_equipamento.quantidade = quantidade
-       
+
         # Alteração status do equipamento
-        equipamentos.status = "Emprestado"
+        equipamentoEmprestimo.status = "Emprestado"
 
         if(dataDevolucao):
             novoEmprestimo.data_devolucao = dataDevolucao
 
-        novoEmprestimo.data_encerramento = novoEmprestimo.data_criacao + timedelta(365)
+        novoEmprestimo.data_encerramento = novoEmprestimo.data_criacao + \
+            timedelta(365)
 
         # Converter assinatura Responsavel
-        ar = retornaData(assinaturaResponsavel) 
+        ar = retornaData(assinaturaResponsavel)
 
         # Converter assinatura Colaborador
         ac = retornaData(assinaturaColaborador)
@@ -572,27 +583,53 @@ def novoEmprestimo(request):
         nomeRespo = request.user
         nomeColab = colaboradorRequisitante.nome
 
-        #write the decoded data back to original format in  file
+        # write the decoded data back to original format in  file
         urlRespoAssi = saveMedia(ar, nomeRespo)
         urlColabAssi = saveMedia(ac, nomeColab)
 
         novoEmprestimo.assinatura_responsavel = urlRespoAssi
         novoEmprestimo.assinatura_colaborador = urlColabAssi
 
-    
         try:
             equipamentoEmprestimo.save()
             novoEmprestimo.save()
-
 
             messages.add_message(request, messages.SUCCESS,
                                  'Emprestimo realizado com sucesso')
         except Exception as Error:
             print(Error)
             messages.add_message(
-                    request, messages.ERROR, 'Não foi possivel realizar o emprestimo')
+                request, messages.ERROR, 'Não foi possivel realizar o emprestimo')
 
     return render(request, template_name='emprestimo/novoEmprestimo.html', context=context)
+
+
+@login_required
+def deletaEmprestimo(request):
+
+    context = {}
+
+    if request.method == "POST":
+        id = request.POST.get("id")
+
+        emprestimo = get_object_or_404(Emprestimo, id=id)
+        equipamentoEmprestimo = Equipamento.objects.filter(
+            nome=emprestimo.emprestimo_equipamento.nome).first()
+
+        equipamentoEmprestimo.status = "Disponivel"
+
+        try:
+            emprestimo.delete()
+            equipamentoEmprestimo.save()
+            messages.add_message(request, messages.SUCCESS,
+                                 "O equipamento foi excluido com sucesso!")
+
+        except ValueError:
+            messages.add_message(request, messages.ERROR,
+                                 "Não foi possivel deletar o equipamento")
+
+    return redirect('index')
+
 
 @login_required
 def encerrarEmprestimo(request):

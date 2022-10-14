@@ -127,7 +127,7 @@
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                                 Emprestimos Encerrados</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">30</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{emp_fechado}}</div>
                                         </div>
                                         <div class="col-auto">
                                             <i class="fa-solid fa-check fa-2x text-gray-300"></i>
@@ -165,7 +165,7 @@
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                                 Emprestimos Abertos</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{emp_aberto}}</div>
                                         </div>
                                         <div class="col-auto">
                                             <i class="fa-solid fa-hourglass fa-2x text-gray-300"></i>
@@ -183,7 +183,7 @@
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
                                                 Equipamentos Emprestados</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{e_empr}}</div>
                                         </div>
                                         <div class="col-auto">
                                             <i class="fa-solid fa-paper-plane fa-2x text-gray-300"></i>
@@ -204,19 +204,21 @@
                                     <th>Colaborador</th>
                                     <th>Situação</th>
                                     <th>Equipamento</th>
-                                    <th>Quantidade</th>
+                                    <th>Numero de Série</th>
                                     <th>Criação do Emprestimo</th>
                                     <th>Data para devolução</th>
                                     <th>Data de Encerramento</th>
+                                    <th>Opções</th>
                                 </thead>
                                 <tfoot>
                                     <th>Colaborador</th>
                                     <th>Situação</th>
                                     <th>Equipamento</th>
-                                    <th>Quantidade</th>
+                                    <th>Numero de Série</th>
                                     <th>Criação do Emprestimo</th>
                                     <th>Data para devolução</th>
                                     <th>Data de Encerramento</th>
+                                    <th>Opções</th>
                                 </tfoot>
                                 <tbody>
                                     {% for emprestimo in emprestimos %}
@@ -224,7 +226,7 @@
                                         <td>{{emprestimo.colaborador.nome}}</td>
                                         <td>{{emprestimo.status_emprestimo}}</td>
                                         <td>{{emprestimo.emprestimo_equipamento.nome}}</td>
-                                        <td>{{emprestimo.emprestimo_equipamento.quantidade}}</td>
+                                        <td>{{emprestimo.emprestimo_equipamento.n_serie}}</td>
                                         <td>{{emprestimo.data_criacao}}</td>
                                         <td> {% if emprestimo.data_devolucao == None %}  
                                                 Indeterminada   
@@ -232,7 +234,67 @@
                                             {{emprestimo.data_devolucao}}
                                             {% endif %}</td>
                                         <td>{{emprestimo.data_encerramento}}</td>
+                                        <td class="text-center">
+                                            <!-- Default dropstart button -->
+                                            <div class="btn-group dropstart">
+                                                <button type="button"
+                                                    class="btn btn-warning btn-sm dropdown-toggle"
+                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                    Opções
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li class="text-center">
+                                                        <a class="btn btn-block" data-bs-toggle="modal"
+                                                            data-bs-target="#modalEditarDisciplina{{item.id}}"
+                                                            data-bs-whatever="@mdo">
+
+
+                                                            <div class="row">
+                                                                <div class="col-2">
+                                                                    <span class="icon text-secondary">
+                                                                        <i class="bi bi-pencil-square"></i>
+                                                                    </span>
+
+                                                                </div>
+                                                                <div class="col-10 text-left">
+
+                                                                    <span class="text">Editar</span>
+                                                                </div>
+                                                            </div>
+                                                        </a>
+
+                                                    </li>
+                                                    <li class="text-center">
+
+                                                        <button type="button" class="btn btn-block"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#modalDeletaEmprestimo{{emprestimo.id}}"
+                                                            data-bs-whatever="@mdo">
+                                                            <div class="row">
+                                                                <div class="col-2">
+                                                                    <span class="icon text-secondary">
+                                                                        <i class="bi bi-trash"></i>
+                                                                    </span>
+
+                                                                </div>
+                                                                <div class="col-10 text-left">
+
+                                                                    <span class="text">
+                                                                        Excluir</span>
+                                                                </div>
+                                                            </div>
+
+                                                        </button>
+
+                                                    </li>
+                                                </ul>
+                                            </div>
+
+                                        </td>
                                     </tr>
+
+                                    {% comment %} {% include 'modais/editarDisciplinaModal.html' %} {% endcomment %}
+                                    {% include 'modais/deletarEmprestimoModal.html' %}
                                     {% endfor %}
                                 </tbody>
                             </table>

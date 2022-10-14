@@ -9,12 +9,14 @@ urlpatterns = [
     path('registro/', registrar, name='registrar'),
 
 
-    
-    path('cadastrarColaborador/', cadastrarColaborador, name='cadastrarColaborador'),
+
+    path('cadastrarColaborador/', cadastrarColaborador,
+         name='cadastrarColaborador'),
     path('deletarColaborador/', deletarColaborador, name='deletarColaborador'),
     path('editarColaborador/', editarColaborador, name='editarColaborador'),
 
-    path('cadastrarEquipamento/', cadastrarEquipamento, name='cadastrarEquipamento'),
+    path('cadastrarEquipamento/', cadastrarEquipamento,
+         name='cadastrarEquipamento'),
     path('deletarEquipamento/', deletarEquipamento, name='deletarEquipamento'),
     path('editarEquipamento/', editarEquipamento, name='editarEquipamento'),
 
@@ -26,5 +28,7 @@ urlpatterns = [
     path('editarUsuario/', editarUsuario, name='editarUsuario'),
 
     path('novoEmprestimo/', novoEmprestimo, name='novoEmprestimo'),
+    path('deletarEmprestimo/', deletaEmprestimo, name='deletarEmprestimo'),
+
 
 ]
