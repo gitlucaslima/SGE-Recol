@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block tituloPagina %}
+<h1 class="mt-4">Editar Emprestimo</h1>
+{% endblock tituloPagina %}
+
+{% block conteudo %}
+<div class="container d-flex justify-content-center">
+    <div class="card w-75 shadow h-100 py-2 ">
+        <h5 class="card-header">Editar Emprestimo</h5>
+
+        {% include 'alerts/messages.html' %}
+
+        <div class="card-body">
+            <form target="_parent" action="{% url 'editarEmprestimo' emprestimo.id %}" class="needs-validation" id="form-novoEmprestimo" method="post" enctype="multipart/form-data">
+
+            {% csrf_token %}
+                <label for="colaborador">Colaborador</label>
+                <select name="colaborador" id="dropdown" class="form-control form-group col-md-12" onchange="changeHiddenInput(this)"  required>
+                    {% if colaborador.nome == emprestimo.colaborador.nome %}
+                            <option value={{colaborador.cpf}}>{{colaborador}}</option>
+                    {% else %}
+                        {% for colaborador in colaboradores %}
+                            <option value={{colaborador.cpf}}>{{colaborador}}</option>
+                        {% endfor %}
+                    {% endif %}                   
+                </select>
+
+                <input type="hidden" name="hiddenInput" id="hiddenInput" />
+
+                <div class="form-group">
+                    <label for="cpf">CPF</label>
+                    <input type="text" id="cpfColaborador" value="{{emprestimo.colaborador.cpf}}" class="form-control cpf" name="cpf" disabled>
+                </div>
+
+                <div class="form-group mt-3">
+                    <label for="equipamento">Equipamento</label>
+                    <select name="equipamento" id="dropdownEquip" class="form-control form-group col-md-12" placeholder='Nenhum valor selecionado...' onchange="changeHiddenInputEquip(this)" required>
+                        <option value="" selected>Selecione um equipamento</option>
+                        {% for equipamento in equipamentos %}
+                            <option value={{equipamento.quantidade}}>{{equipamento}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <input type="hidden" name="hiddenInputEquip" id="hiddenInputEquip"/>
+
+                <div class="row">
+                    <div class="form-group col-md-8">
+                        <label for="quantidade">Quantidade</label>
+                        <input type="number" id="quantidadeEquipamento" min="1" max="{{equipamento.quantidade}}"  class="form-control" name="quantidade" required>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="quantidade">Disponivel</label>
+                        <input type="number" id="quantidadeDisponivel" value="{{equipamento.quantidade}}" max="{{equipamento.quantidade}}" class="form-control" name="quantidadeDisponivel" disabled>
+                    </div>
+
+                    <input type="hidden" name="nomeEquipamento" value="nome" id="nomeEquipamento"/>
+
+                    <div id="minhaDiv" display="none" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Erro!</strong> Quantidade indisponivel
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group mt-3 col-md-12">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked>
+                        <label class="form-check-label" for="flexSwitchCheckChecked">Data de devolução indeterminada</label>
+                    </div>
+                     <div id="divDate" style="display:none">
+                        <input type="date" name="data" id="inputDate" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group mt-3">
+                    <label for="Assinatura">Assinaturas</label>
+
+                    <div class="form-group mt-2 col-md-12" >
+                        <div class="row">
+                            <div class="col">
+                                <button type="button" 
+                        class="btn btn-primary" 
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalCadastrarAssinaturaResponsavel"
+                        data-bs-whatever="@mdo" 
+                        required>
+                            <span class="text">Assinatura do responsavel</span>
+                        </button>
+                                <input type="hidden" id="assinaturaResponsavel" name="assinaturaResponsavel" required/>
+                                <img src="https://st2.depositphotos.com/5007459/8489/v/450/depositphotos_84895786-stock-illustration-writing-hand.jpg" id="respo" alt="Assinatura" style="height:5rem; width:10rem">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-2 col-md-12" >
+
+                        <div class="d-flex row">
+                            <div class="col">
+                                <button type="button" 
+                        class="btn btn-secondary" 
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalCadastrarAssinaturaColaborador"
+                        data-bs-whatever="@mdo" 
+                        required>
+                            <span class="text">Assinatura do colaborador</span>
+                        </button>
+                                <input type="hidden" id="assinaturaColaborador" name="assinaturaColaborador" required/>
+                                <img src="https://st2.depositphotos.com/5007459/8489/v/450/depositphotos_84895786-stock-illustration-writing-hand.jpg" id="colab" alt="Assinatura" style="height:5rem; width:10rem">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="footer">
+                    <hr>
+                    <div class="d-flex justify-content-center row">
+                        <div class="col-12 col-md-3 text-center">
+                            <button type="submit" class="btn btn-success btn-icon-split">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                                <span class="text">Salvar</span>
+                            </button>
+                        </div>
+
+                        <div class="col-12 col-md-3 text-center">
+                            <button type="reset" id="btnCancelar" class="btn btn-danger btn-icon-split">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-close"></i>
+                                </span>
+                                <span class="text">Cancelar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            {% include 'modais/cadastrarAssinaturaResponsavelModal.html' %}
+            {% include 'modais/cadastrarAssinaturaColaboradorModal.html' %}
+
+        </div>
+    </div>
+</div>
+
+<script src={% static 'js/semantic.js' %}></script>
+
+{% endblock conteudo %}
+

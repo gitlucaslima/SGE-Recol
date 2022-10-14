@@ -1,4 +1,5 @@
 import base64
+from django.core.signing import TimestampSigner
 
 
 def retornaData(assinatura):
@@ -6,20 +7,23 @@ def retornaData(assinatura):
     acConvertida = ac[1]
     encoded_data = acConvertida
 
-    decoded_data=base64.b64decode((encoded_data))
+    decoded_data = base64.b64decode((encoded_data))
 
     return decoded_data
-    
+
 
 def saveMedia(assinatura, identidade):
-        nome = str(identidade)
-        print(nome)
-        local = 'media/'
-        ext = '.png'
-        url = local+nome+ext
 
-        img_file = open(url, 'wb')
-        img_file.write(assinatura)
-        img_file.close()
+    local = 'media/assinaturas/'
+    # Gerar um hash de
+    signer = TimestampSigner()
+    value = signer.sign(identidade).split(":")[-1]
 
-        return url
+    ext = '.png'
+    url = local+'assinatura'+value+ext
+
+    img_file = open(url, 'wb')
+    img_file.write(assinatura)
+    img_file.close()
+
+    return url

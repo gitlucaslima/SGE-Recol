@@ -1,6 +1,3 @@
-from enum import auto, unique
-from urllib import request
-
 from cpf_field.models import CPFField
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
@@ -112,7 +109,7 @@ class Usuario(User):
 
 class Emprestimo(models.Model):
     colaborador = models.ForeignKey(Colaborador,
-                                    on_delete=models.CASCADE,
+                                    on_delete=models.PROTECT,
                                     null=False,
                                     blank=False,
                                     )
@@ -136,7 +133,7 @@ class Emprestimo(models.Model):
 
     emprestimo_equipamento = models.ForeignKey(
         Equipamento,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         null=False,
         blank=False,
     )
@@ -164,3 +161,31 @@ class Emprestimo(models.Model):
         blank=False,
         null=False,
     )
+
+
+class TermoRespo(models.Model):
+    colaborador = models.ForeignKey(Colaborador,
+                                    on_delete=models.PROTECT,
+                                    null=False,
+                                    blank=False,
+                                    )
+    Emprestimo = models.ForeignKey(Emprestimo,
+                                   on_delete=models.PROTECT,
+                                   null=False,
+                                   blank=False,
+                                   )
+    url_termoRespo = models.FileField(upload_to="termos/")
+
+
+class TermoDevo(models.Model):
+    colaborador = models.ForeignKey(Colaborador,
+                                    on_delete=models.PROTECT,
+                                    null=False,
+                                    blank=False,
+                                    )
+    Emprestimo = models.ForeignKey(Emprestimo,
+                                   on_delete=models.PROTECT,
+                                   null=False,
+                                   blank=False,
+                                   )
+    url_termoRespo = models.FileField(upload_to="termos/")

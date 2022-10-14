@@ -28,7 +28,10 @@ urlpatterns = [
     path('editarUsuario/', editarUsuario, name='editarUsuario'),
 
     path('novoEmprestimo/', novoEmprestimo, name='novoEmprestimo'),
+    path('editarEmprestimo/<int:id>/',
+         editarEmprestimo, name='editarEmprestimo'),
     path('deletarEmprestimo/', deletaEmprestimo, name='deletarEmprestimo'),
-
+    path('finalizarEmprestimo/<str:id>/',
+         finalizarEmprestimo, name='finalizarEmprestimo'),
 
 ]

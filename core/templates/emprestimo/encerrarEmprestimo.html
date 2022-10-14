@@ -5,4 +5,84 @@
 {% endblock tituloPagina %}
 
 {% block conteudo %}
+
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-table me-1"></i>
+        Escolha um emprestimo
+    </div>
+
+    <div class="card-body">
+        <table id="datatablesSimple">
+            <thead>
+                <th>Colaborador</th>
+                <th>Situação</th>
+                <th>Equipamento</th>
+                <th>Numero de Série</th>
+                <th>Criação do Emprestimo</th>
+                <th>Data para devolução</th>
+                <th>Data de Encerramento</th>
+                <th>Opções</th>
+            </thead>
+            <tfoot>
+                <th>Colaborador</th>
+                <th>Situação</th>
+                <th>Equipamento</th>
+                <th>Numero de Série</th>
+                <th>Criação do Emprestimo</th>
+                <th>Data para devolução</th>
+                <th>Data de Encerramento</th>
+                <th>Opções</th>
+            </tfoot>
+            <tbody>
+                {% for emprestimo in emprestimos %}
+                <tr>
+                    <td>{{emprestimo.colaborador.nome}}</td>
+                    <td>{{emprestimo.status_emprestimo}}</td>
+                    <td>{{emprestimo.emprestimo_equipamento.nome}}</td>
+                    <td>{{emprestimo.emprestimo_equipamento.n_serie}}</td>
+                    <td>{{emprestimo.data_criacao}}</td>
+                    <td> {% if emprestimo.data_devolucao == None %}  
+                            Indeterminada   
+                        {% else %}
+                        {{emprestimo.data_devolucao}}
+                        {% endif %}</td>
+                    <td>{{emprestimo.data_encerramento}}</td>
+                    <td class="text-center">
+                        <!-- Default dropstart button -->
+                        <div class="btn-group">
+                            <div class="d-grid gap-2 justify-content-md-center">
+
+
+                                {% if emprestimo.status_emprestimo == "Aberto" %}
+
+                                    <a type="button" href="{% url 'finalizarEmprestimo' emprestimo.id %}" class="btn btn-danger ml-1 mr-1 btn-icon-split">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-close"></i>
+                                        </span>
+                                        <span class="text">Encerrar Emprestimo</span>
+                                    </a>
+
+                                {% else %}
+                                    <button type="submit" class="btn btn-primary mt-auto btn-icon-split">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-check"></i>
+                                        </span>
+                                        <span class="text">Baixar Termo</span>
+                                    </button>
+                                    
+                                {% endif %}
+                                
+                                    
+                            </div>
+                        </div>
+
+                    </td>
+                </tr>
+
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock conteudo %}

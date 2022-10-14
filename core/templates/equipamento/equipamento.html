@@ -139,25 +139,52 @@
                             </li>
                             <li class="text-center">
 
-                                <button type="button" class="btn btn-block"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#modalDeletaEquipamento{{item.id}}"
-                                    data-bs-whatever="@mdo">
-                                    <div class="row">
-                                        <div class="col-2">
-                                            <span class="icon text-secondary">
-                                                <i class="bi bi-trash"></i>
-                                            </span>
+                                {% if item.status == "Emprestado" %}
 
+                                    <button type="button" class="btn btn-block"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalEmprestadoEquipamento{{item.id}}"
+                                        data-bs-whatever="@mdo">
+                                        <div class="row">
+                                            <div class="col-2">
+                                                <span class="icon text-secondary">
+                                                    <i class="bi bi-trash"></i>
+                                                </span>
+
+                                            </div>
+                                            <div class="col-10 text-left">
+
+                                                <span class="text">
+                                                    Excluir</span>
+                                            </div>
                                         </div>
-                                        <div class="col-10 text-left">
 
-                                            <span class="text">
-                                                Excluir</span>
-                                        </div>
-                                    </div>
+                                    </button>
 
-                                </button>
+
+                                {% else %}
+
+                                        <button type="button" class="btn btn-block"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalDeletaEquipamento{{item.id}}"
+                                                data-bs-whatever="@mdo">
+                                            <div class="row">
+                                                <div class="col-2">
+                                                    <span class="icon text-secondary">
+                                                        <i class="bi bi-trash"></i>
+                                                    </span>
+
+                                                </div>
+                                                <div class="col-10 text-left">
+
+                                                    <span class="text">
+                                                        Excluir</span>
+                                                </div>
+                                            </div>
+
+                                        </button>
+
+                                {% endif %}
 
                             </li>
                         </ul>
@@ -168,6 +195,8 @@
 
                 {% include 'modais/deletarEquipamentoModal.html' %}
                 {% include 'modais/editarEquipamentoModal.html' %}
+                {% include 'modais/emprestadoModal.html' %}
+
 
                 {% endfor %}
               </tbody>

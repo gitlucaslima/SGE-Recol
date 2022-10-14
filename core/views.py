@@ -1,12 +1,17 @@
 
 import base64
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
+from django.core.signing import TimestampSigner
 from os import name
+import locale
+import datetime
 
 from django.contrib import messages
 from django.contrib.auth import login as login_check
 from django.contrib.auth import logout as logout_django
 from django.contrib.auth.decorators import login_required
+from docxtpl import DocxTemplate
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from PIL import Image
 from validate_docbr import CPF
@@ -586,18 +591,74 @@ def novoEmprestimo(request):
         # write the decoded data back to original format in  file
         urlRespoAssi = saveMedia(ar, nomeRespo)
         urlColabAssi = saveMedia(ac, nomeColab)
-
+        print(urlRespoAssi)
+        print(urlColabAssi)
         novoEmprestimo.assinatura_responsavel = urlRespoAssi
         novoEmprestimo.assinatura_colaborador = urlColabAssi
 
+        # Importação do doc que será usado como template
+        doc = DocxTemplate("media/modelo/modeloRespo.docx")
+
+        locale.getlocale()
+        ('pt_BR', 'UTF-8')
+
+        # this sets the date time formats to es_ES, there are many other options for currency, numbers etc.
+        locale.setlocale(locale.LC_TIME, 'pt_BR')
+        'pt_BR'
+
+        today = datetime.datetime.now()
+
+        datetime.datetime(2020, 2, 14, 10, 33, 56, 487228)
+
+        data = today.strftime('%d de %B de %Y')
+
+        # Trocar informações pelas do modelo
+        context = {
+            "nomeColaborador": colaboradorRequisitante.nome,
+            "cpf": colaboradorRequisitante.cpf,
+            "rg": colaboradorRequisitante.rg,
+            "quantidade": quantidade,
+            "equipamento": nomeEquipamento,
+            "n_serie": equipamentoEmprestimo.n_serie,
+            "data": data
+        }
+
+        # Trocar assinatura do responsavel e do colab, pelas do modelo
+        doc.replace_pic('Imagem 10', urlColabAssi)
+        doc.replace_pic('Imagem 11', urlRespoAssi)
+
+        # Aplicar a troca de informações
+        doc.render(context)
+
+        # Gerar um hash de
+        signer = TimestampSigner()
+        value = signer.sign(colaboradorRequisitante.nome).split(":")[-1]
+
+        nome_arquivo = f"media/termos/termo{value}.docx"
+
         try:
-            equipamentoEmprestimo.save()
+            doc.save(nome_arquivo)
+
+        except Exception as e1:
+            print(e1)
+
+            messages.add_message(request, messages.ERROR,
+                                 "Não foi possivel gerar o documento")
+            return render(request, template_name='emprestimo/novoEmprestimo.html', context=context)
+
+        novo_termo = TermoRespo()
+        novo_termo.colaborador = colaboradorRequisitante
+        novo_termo.Emprestimo = novoEmprestimo
+        novo_termo.url_termoRespo = nome_arquivo
+
+        try:
             novoEmprestimo.save()
+            novo_termo.save()
+            equipamentoEmprestimo.save()
 
             messages.add_message(request, messages.SUCCESS,
                                  'Emprestimo realizado com sucesso')
         except Exception as Error:
-            print(Error)
             messages.add_message(
                 request, messages.ERROR, 'Não foi possivel realizar o emprestimo')
 
@@ -622,15 +683,163 @@ def deletaEmprestimo(request):
             emprestimo.delete()
             equipamentoEmprestimo.save()
             messages.add_message(request, messages.SUCCESS,
-                                 "O equipamento foi excluido com sucesso!")
+                                 "O emprestimo foi excluido com sucesso!")
 
         except ValueError:
             messages.add_message(request, messages.ERROR,
-                                 "Não foi possivel deletar o equipamento")
+                                 "Não foi possivel deletar o emprestimo")
 
     return redirect('index')
 
 
 @login_required
+def editarEmprestimo(request, id):
+
+    emprestimo = get_object_or_404(Emprestimo, pk=id)
+
+    context = {}
+
+    colaboradores = Colaborador.objects.all()
+    equipamentos = Equipamento.objects.filter(status="Disponivel")
+    context['colaboradores'] = colaboradores
+    context['equipamentos'] = equipamentos
+    context['emprestimo'] = emprestimo
+
+    if request.method == "POST":
+        colaborador = request.POST.get("colaborador")
+        nomeEquipamento = request.POST.get("nomeEquipamento")
+        quantidade = request.POST.get("quantidade")
+        dataDevolucao = request.POST.get("data")
+        assinaturaColaborador = request.POST.get("assinaturaColaborador")
+        assinaturaResponsavel = request.POST.get("assinaturaResponsavel")
+
+        emprestimo = get_object_or_404(Emprestimo, pk=id)
+        colaboradorSolicitante = get_object_or_404(
+            Colaborador, cpf=colaborador)
+
+        emprestimo.colaborador = colaboradorSolicitante
+
+        equipamentoEmprestimo = Equipamento.objects.filter(
+            nome=nomeEquipamento).first()
+
+        if(equipamentoEmprestimo.quantidade < int(quantidade)):
+            messages.add_message(request, messages.ERROR,
+                                 'Quantidade solicitada indisponivel')
+            return render(request, template_name='emprestimo/editarEmprestimo.html', context=context)
+
+        equipamentoAntigo = emprestimo.emprestimo_equipamento
+
+        equipamentoAntigo.status = "Disponivel"
+        equipamentoAntigo.quantidade = quantidade
+
+        emprestimo.emprestimo_equipamento = equipamentoEmprestimo
+        equipamentoEmprestimo.status = "Emprestado"
+
+        equipamentoEmprestimo.quantidade = quantidade
+
+        if(dataDevolucao):
+            emprestimo.data_devolucao = dataDevolucao
+
+        emprestimo.data_encerramento = emprestimo.data_criacao + \
+            timedelta(365)
+
+        # Converter assinatura Responsavel
+        ar = retornaData(assinaturaResponsavel)
+
+        # Converter assinatura Colaborador
+        ac = retornaData(assinaturaColaborador)
+
+        # Nomeando as assinaturas
+        nomeRespo = request.user
+        nomeColab = emprestimo.colaborador.nome
+
+        # write the decoded data back to original format in  file
+        urlRespoAssi = saveMedia(ar, nomeRespo)
+        urlColabAssi = saveMedia(ac, nomeColab)
+
+        emprestimo.assinatura_responsavel = urlRespoAssi
+        emprestimo.assinatura_colaborador = urlColabAssi
+
+        try:
+            equipamentoEmprestimo.save()
+            emprestimo.save()
+            equipamentoAntigo.save()
+
+            messages.add_message(request, messages.SUCCESS,
+                                 'Informações alteradas com sucesso')
+        except Exception as Error:
+            print(Error)
+            messages.add_message(
+                request, messages.ERROR, 'Não foi possivel alterar as informações do emprestimo')
+
+    return render(request, template_name='emprestimo/editarEmprestimo.html', context=context)
+
+
+@login_required
 def encerrarEmprestimo(request):
-    return render(request, template_name='emprestimo/encerrarEmprestimo.html')
+
+    context = {}
+    # Emprestimos
+    emprestimos = Emprestimo.objects.all()  # todos
+    emp_aberto = Emprestimo.objects.filter(
+        status_emprestimo='Aberto').count()  # abertos
+    emp_fechado = Emprestimo.objects.filter(
+        status_emprestimo='Encerrado').count()  # abertos
+
+    context['emp_aberto'] = emp_aberto
+    context['emp_fechado'] = emp_fechado
+    context['emprestimos'] = emprestimos
+
+    return render(request, template_name='emprestimo/encerrarEmprestimo.html', context=context)
+
+
+@login_required
+def finalizarEmprestimo(request, id):
+    context = {}
+    emprestimo = get_object_or_404(Emprestimo, pk=id)
+    context['emprestimo'] = emprestimo
+
+    if request.method == "POST":
+        emprestimo = get_object_or_404(Emprestimo, pk=id)
+        assinaturaColaborador = request.POST.get("assinaturaColaborador")
+        assinaturaResponsavel = request.POST.get("assinaturaResponsavel")
+
+        emprestimo.data_devolucao = datetime.today()
+        emprestimo.data_encerramento = datetime.today()
+
+        equipamento = Equipamento.objects.filter(
+            nome=emprestimo.emprestimo_equipamento.nome).first()
+
+        equipamento.status = "Disponivel"
+        equipamento.quantidade = emprestimo.emprestimo_equipamento.quantidade
+
+        emprestimo.status_emprestimo = "Encerrado"
+
+        # Converter assinatura Responsavel
+        ar = retornaData(assinaturaResponsavel)
+
+        # Converter assinatura Colaborador
+        ac = retornaData(assinaturaColaborador)
+
+        # Nomeando as assinaturas
+        nomeRespo = request.user
+        nomeColab = emprestimo.colaborador.nome
+
+        # write the decoded data back to original format in  file
+        urlRespoAssi = saveMedia(ar, nomeRespo)
+        urlColabAssi = saveMedia(ac, nomeColab)
+
+        emprestimo.assinatura_responsavel = urlRespoAssi
+        emprestimo.assinatura_colaborador = urlColabAssi
+
+        try:
+            equipamento.save()
+            emprestimo.save()
+
+            messages.add_message(request, messages.SUCCESS,
+                                 'Emprestimo finalizado com sucesso')
+        except Exception as Error:
+            messages.add_message(
+                request, messages.ERROR, 'Não foi possivel finalizar o emprestimo')
+
+    return render(request, template_name='emprestimo/finalizarEmprestimo.html', context=context)
