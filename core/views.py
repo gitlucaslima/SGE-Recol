@@ -1,18 +1,20 @@
 
 import base64
-from datetime import date, datetime, timedelta
-from django.core.signing import TimestampSigner
-from os import name
+import datetime as dt
 import locale
-import datetime
+import os
+from datetime import date, datetime, timedelta
+from os import name
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login as login_check
 from django.contrib.auth import logout as logout_django
 from django.contrib.auth.decorators import login_required
-from docxtpl import DocxTemplate
-from django.http import HttpResponse, JsonResponse
+from django.core.signing import TimestampSigner
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from docxtpl import DocxTemplate
 from PIL import Image
 from validate_docbr import CPF
 
@@ -49,7 +51,7 @@ def login(request):
         if(is_user and (is_active == 1)):
             login_check(request, user)
 
-            return render(request, template_name='base.html')
+            return redirect("index")
         else:
             messages.add_message(request, messages.ERROR,
                                  "Login ou senha inválidos")
@@ -118,11 +120,16 @@ def index(request):
 
     context = {}
 
-    # Equipamentos
+    termosRepo = TermoRespo.objects.all()
+    termosDevo = TermoDevo.objects.all()
+
+    # Equipamentos disponiveis
     e_disponivel = Equipamento.objects.filter(
-        status='Disponivel').count()  # disponiveis
+        status='Disponivel').count()
+
+    # Equipamentos emprestados
     e_emprestado = Equipamento.objects.filter(
-        status='Emprestado').count()  # disponiveis
+        status='Emprestado').count()  
 
     # Emprestimos
     emprestimos = Emprestimo.objects.all()  # todos
@@ -133,6 +140,10 @@ def index(request):
 
     context['e_dispo'] = e_disponivel
     context['e_empr'] = e_emprestado
+
+    context['termosRepo'] = termosRepo
+    context['termosDevo'] = termosDevo
+
 
     context['emprestimos'] = emprestimos
     context['emp_aberto'] = emp_aberto
@@ -591,8 +602,10 @@ def novoEmprestimo(request):
         # write the decoded data back to original format in  file
         urlRespoAssi = saveMedia(ar, nomeRespo)
         urlColabAssi = saveMedia(ac, nomeColab)
+
         print(urlRespoAssi)
         print(urlColabAssi)
+        
         novoEmprestimo.assinatura_responsavel = urlRespoAssi
         novoEmprestimo.assinatura_colaborador = urlColabAssi
 
@@ -606,16 +619,31 @@ def novoEmprestimo(request):
         locale.setlocale(locale.LC_TIME, 'pt_BR')
         'pt_BR'
 
-        today = datetime.datetime.now()
+        today = dt.datetime.now()
 
-        datetime.datetime(2020, 2, 14, 10, 33, 56, 487228)
+        dt.datetime(2020, 2, 14, 10, 33, 56, 487228)
 
         data = today.strftime('%d de %B de %Y')
 
+        def formatcpf(cpf):
+            vezes = 0
+            novo = ""
+            for quantidade in range(11):
+                numero = cpf[quantidade]
+                novo += numero
+                vezes += 1
+                if(quantidade == 8):
+                    novo += "-"
+                    vezes -= 3
+                if(vezes == 3):
+                    novo += "."
+                    vezes -= 3
+            return novo
+        
         # Trocar informações pelas do modelo
         context = {
             "nomeColaborador": colaboradorRequisitante.nome,
-            "cpf": colaboradorRequisitante.cpf,
+            "cpf": formatcpf(colaboradorRequisitante.cpf),
             "rg": colaboradorRequisitante.rg,
             "quantidade": quantidade,
             "equipamento": nomeEquipamento,
@@ -640,10 +668,8 @@ def novoEmprestimo(request):
             doc.save(nome_arquivo)
 
         except Exception as e1:
-            print(e1)
-
             messages.add_message(request, messages.ERROR,
-                                 "Não foi possivel gerar o documento")
+                                 "Não foi possivel gerar o termo de responsabilidade")
             return render(request, template_name='emprestimo/novoEmprestimo.html', context=context)
 
         novo_termo = TermoRespo()
@@ -832,7 +858,75 @@ def finalizarEmprestimo(request, id):
         emprestimo.assinatura_responsavel = urlRespoAssi
         emprestimo.assinatura_colaborador = urlColabAssi
 
+         # Importação do doc que será usado como template
+        doc = DocxTemplate("media/modelo/modeloDevo.docx")
+
+        locale.getlocale()
+        ('pt_BR', 'UTF-8')
+
+        # this sets the date time formats to es_ES, there are many other options for currency, numbers etc.
+        locale.setlocale(locale.LC_TIME, 'pt_BR')
+        'pt_BR'
+
+        today = dt.datetime.now()
+
+        dt.datetime(2020, 2, 14, 10, 33, 56, 487228)
+
+        data = today.strftime('%d de %B de %Y')
+
+        def formatcpf(cpf):
+            vezes = 0
+            novo = ""
+            for quantidade in range(11):
+                numero = cpf[quantidade]
+                novo += numero
+                vezes += 1
+                if(quantidade == 8):
+                    novo += "-"
+                    vezes -= 3
+                if(vezes == 3):
+                    novo += "."
+                    vezes -= 3
+            return novo
+
+        # Trocar informações pelas do modelo
+        conteudo = {
+            "nomeColaborador": emprestimo.colaborador.nome,
+            "cpf": formatcpf(emprestimo.colaborador.cpf),
+            "equipamento": emprestimo.emprestimo_equipamento.nome,
+            "n_serie": emprestimo.emprestimo_equipamento.n_serie,
+            "data": data
+        }
+
+        # Trocar assinatura do responsavel e do colab, pelas do modelo
+        doc.replace_pic('Imagem 10', urlColabAssi)
+        doc.replace_pic('Imagem 10', urlRespoAssi)
+
+        # Aplicar a troca de informações
+        doc.render(conteudo)
+
+        # Gerar um hash de
+        signer = TimestampSigner()
+        value = signer.sign(emprestimo.colaborador.nome).split(":")[-1]
+
+        nome_arquivo = f"media/termos/termo{value}.docx"
+
         try:
+            doc.save(nome_arquivo)
+
+        except Exception as e1:
+            print(e1)
+            messages.add_message(request, messages.ERROR,
+                                 "Não foi possivel gerar o termo de devolução")
+            return render(request, template_name='emprestimo/finalizarEmprestimo.html', context=context)
+
+        novo_termo = TermoDevo()
+        novo_termo.colaborador = emprestimo.colaborador
+        novo_termo.Emprestimo = emprestimo
+        novo_termo.url_termoDevo = nome_arquivo
+
+        try:
+            novo_termo.save()
             equipamento.save()
             emprestimo.save()
 

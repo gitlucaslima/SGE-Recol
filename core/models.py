@@ -170,7 +170,7 @@ class TermoRespo(models.Model):
                                     blank=False,
                                     )
     Emprestimo = models.ForeignKey(Emprestimo,
-                                   on_delete=models.PROTECT,
+                                   on_delete=models.CASCADE,
                                    null=False,
                                    blank=False,
                                    )
@@ -184,8 +184,8 @@ class TermoDevo(models.Model):
                                     blank=False,
                                     )
     Emprestimo = models.ForeignKey(Emprestimo,
-                                   on_delete=models.PROTECT,
+                                   on_delete=models.CASCADE,
                                    null=False,
                                    blank=False,
                                    )
-    url_termoRespo = models.FileField(upload_to="termos/")
+    url_termoDevo = models.FileField(upload_to="termos/")
