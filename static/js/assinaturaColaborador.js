@@ -32,6 +32,7 @@ jQuery(document).ready(function($){
 
             //Elemento na página chamadora que será adicionado o valor da filho
             var assinaturaColaborador = window.document.getElementById("assinaturaColaborador");
+            console.log(assinaturaColaborador)
             var colab = window.document.getElementById("colab");
 
             assinaturaColaborador.value = assinatura

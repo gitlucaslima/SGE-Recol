@@ -138,25 +138,52 @@
                           </li>
                           <li class="text-center">
 
-                              <button type="button" class="btn btn-block"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#modalDeletaColaborador{{item.id}}"
-                                  data-bs-whatever="@mdo">
-                                  <div class="row">
-                                      <div class="col-2">
-                                          <span class="icon text-secondary">
-                                              <i class="bi bi-trash"></i>
-                                          </span>
+                            {% if item.nome in devedores %}
 
-                                      </div>
-                                      <div class="col-10 text-left">
+                                    <button type="button" class="btn btn-block"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalDevendo{{item.id}}"
+                                        data-bs-whatever="@mdo">
+                                        <div class="row">
+                                            <div class="col-2">
+                                                <span class="icon text-secondary">
+                                                    <i class="bi bi-trash"></i>
+                                                </span>
 
-                                          <span class="text">
-                                              Excluir</span>
-                                      </div>
-                                  </div>
+                                            </div>
+                                            <div class="col-10 text-left">
 
-                              </button>
+                                                <span class="text">
+                                                    Excluir</span>
+                                            </div>
+                                        </div>
+
+                                    </button>
+
+
+                            {% else %}
+
+                                <button type="button" class="btn btn-block"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modalDeletaColaborador{{item.id}}"
+                                    data-bs-whatever="@mdo">
+                                    <div class="row">
+                                        <div class="col-2">
+                                            <span class="icon text-secondary">
+                                                <i class="bi bi-trash"></i>
+                                            </span>
+
+                                        </div>
+                                        <div class="col-10 text-left">
+
+                                            <span class="text">
+                                                Excluir</span>
+                                        </div>
+                                    </div>
+
+                                </button>
+
+                            {% endif %}
 
                           </li>
                       </ul>
@@ -167,6 +194,7 @@
 
               {% include 'modais/deletarColaboradorModal.html' %}
               {% include 'modais/editarColaboradorModal.html' %}
+              {% include 'modais/devendoModal.html' %}
 
               {% endfor %}
             </tbody>

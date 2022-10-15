@@ -1,0 +1,25 @@
+<div class="modal fade" id="modalDevendo{{item.id}}" aria-labelledby="modalDevendo{{item.id}}"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><b>Excluir Colaborador</b></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <span> Não é possivel excluir o colaborador(ra) <strong> {{item.nome}} </strong> pois esta vinculado(a) a um emprestimo.</span>
+    
+            </div>
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                    data-bs-target="#modalDevendo{{item.id}}" data-bs-whatever="@mdo">Fechar
+                </button>
+                
+            </div>
+        </div>
+
+    </div>
+</div>  
+

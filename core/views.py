@@ -1,7 +1,7 @@
-
 import base64
 import datetime as dt
 import locale
+import time
 import os
 from datetime import date, datetime, timedelta
 from os import name
@@ -129,7 +129,7 @@ def index(request):
 
     # Equipamentos emprestados
     e_emprestado = Equipamento.objects.filter(
-        status='Emprestado').count()  
+        status='Emprestado').count()
 
     # Emprestimos
     emprestimos = Emprestimo.objects.all()  # todos
@@ -143,7 +143,6 @@ def index(request):
 
     context['termosRepo'] = termosRepo
     context['termosDevo'] = termosDevo
-
 
     context['emprestimos'] = emprestimos
     context['emp_aberto'] = emp_aberto
@@ -271,8 +270,16 @@ def cadastrarColaborador(request):
     if request.method == "GET":
 
         colaboradores = Colaborador.objects.all()
+        emprestimos = Emprestimo.objects.all()
+
+        devedores = []
+        for emprestimo in emprestimos:
+            if emprestimo.status_emprestimo == "Aberto":
+                devedores.append(emprestimo.colaborador.nome)
+
         context = {}
         context['colaboradores'] = colaboradores
+        context['devedores'] = devedores
 
         return render(request, template_name='colaborador/colaborador.html', context=context)
 
@@ -553,6 +560,18 @@ def novoEmprestimo(request):
         assinaturaColaborador = request.POST.get("assinaturaColaborador")
         assinaturaResponsavel = request.POST.get("assinaturaResponsavel")
 
+        if assinaturaColaborador == assinaturaResponsavel:
+            print('b.o')
+
+        print(len(assinaturaColaborador))
+        print(len(assinaturaResponsavel))
+
+        if not(assinaturaColaborador or assinaturaResponsavel):
+            messages.add_message(
+                request, messages.ERROR, 'Preencha a(as) assinaturas')
+
+            return render(request, template_name='emprestimo/novoEmprestimo.html', context=context)
+
         responsavel = Usuario.objects.filter(first_name=request.user).first()
         colaboradorRequisitante = Colaborador.objects.filter(
             cpf=colaborador).first()
@@ -596,18 +615,15 @@ def novoEmprestimo(request):
         ac = retornaData(assinaturaColaborador)
 
         # Nomeando as assinaturas
-        nomeRespo = request.user
+        nomeRespo = str(request.user)
         nomeColab = colaboradorRequisitante.nome
+
+        urlColabAssi = saveMedia(ac, nomeColab)
+        novoEmprestimo.assinatura_colaborador = urlColabAssi
 
         # write the decoded data back to original format in  file
         urlRespoAssi = saveMedia(ar, nomeRespo)
-        urlColabAssi = saveMedia(ac, nomeColab)
-
-        print(urlRespoAssi)
-        print(urlColabAssi)
-        
         novoEmprestimo.assinatura_responsavel = urlRespoAssi
-        novoEmprestimo.assinatura_colaborador = urlColabAssi
 
         # Importação do doc que será usado como template
         doc = DocxTemplate("media/modelo/modeloRespo.docx")
@@ -639,7 +655,7 @@ def novoEmprestimo(request):
                     novo += "."
                     vezes -= 3
             return novo
-        
+
         # Trocar informações pelas do modelo
         context = {
             "nomeColaborador": colaboradorRequisitante.nome,
@@ -652,8 +668,8 @@ def novoEmprestimo(request):
         }
 
         # Trocar assinatura do responsavel e do colab, pelas do modelo
-        doc.replace_pic('Imagem 10', urlColabAssi)
-        doc.replace_pic('Imagem 11', urlRespoAssi)
+        doc.replace_pic('Imagem 21', "media/"+urlRespoAssi)
+        doc.replace_pic('Imagem 24', "media/"+urlColabAssi)
 
         # Aplicar a troca de informações
         doc.render(context)
@@ -705,6 +721,26 @@ def deletaEmprestimo(request):
 
         equipamentoEmprestimo.status = "Disponivel"
 
+        termoDevo = TermoDevo.objects.filter(
+            colaborador=emprestimo.colaborador).first()
+
+        termoRespo = TermoRespo.objects.filter(
+            colaborador=emprestimo.colaborador).first()
+
+        if not(termoDevo):
+            messages.add_message(
+                request, messages.ERROR, 'O emprestimo ainda não foi finalizado')
+
+            return redirect('index')
+
+        if os.path.exists(termoDevo.url_termoDevo.path):
+            os.rm(termoDevo.url_termoDevo)
+            print('removeu')
+
+        if os.path.exists(termoRespo.url_termoRespo.path):
+            os.rm(termoRespo.url_termoRespo)
+            print('removeu')
+
         try:
             emprestimo.delete()
             equipamentoEmprestimo.save()
@@ -739,7 +775,16 @@ def editarEmprestimo(request, id):
         assinaturaColaborador = request.POST.get("assinaturaColaborador")
         assinaturaResponsavel = request.POST.get("assinaturaResponsavel")
 
+        if not(assinaturaColaborador or assinaturaResponsavel):
+            messages.add_message(
+                request, messages.ERROR, 'Preencha a(as) assinaturas')
+
+            return render(request, template_name='emprestimo/editarEmprestimo.html', context=context)
+
         emprestimo = get_object_or_404(Emprestimo, pk=id)
+        # assinaturaColaboradorAntiga = emprestimo.assinatura_colaborador.path
+        # assinaturaResponsavelAntiga = emprestimo.assinatura_responsavel.path
+
         colaboradorSolicitante = get_object_or_404(
             Colaborador, cpf=colaborador)
 
@@ -786,7 +831,82 @@ def editarEmprestimo(request, id):
         emprestimo.assinatura_responsavel = urlRespoAssi
         emprestimo.assinatura_colaborador = urlColabAssi
 
+        # Importação do doc que será usado como template
+        doc = DocxTemplate("media/modelo/modeloRespo.docx")
+
+        locale.getlocale()
+        ('pt_BR', 'UTF-8')
+
+        # this sets the date time formats to es_ES, there are many other options for currency, numbers etc.
+        locale.setlocale(locale.LC_TIME, 'pt_BR')
+        'pt_BR'
+
+        today = dt.datetime.now()
+
+        dt.datetime(2020, 2, 14, 10, 33, 56, 487228)
+
+        data = today.strftime('%d de %B de %Y')
+
+        def formatcpf(cpf):
+            vezes = 0
+            novo = ""
+            for quantidade in range(11):
+                numero = cpf[quantidade]
+                novo += numero
+                vezes += 1
+                if(quantidade == 8):
+                    novo += "-"
+                    vezes -= 3
+                if(vezes == 3):
+                    novo += "."
+                    vezes -= 3
+            return novo
+
+        # Trocar informações pelas do modelo
+        conteudo = {
+            "nomeColaborador": emprestimo.colaborador.nome,
+            "cpf": formatcpf(emprestimo.colaborador.cpf),
+            "quantidade": quantidade,
+            "equipamento": emprestimo.emprestimo_equipamento.nome,
+            "n_serie": emprestimo.emprestimo_equipamento.n_serie,
+            "data": data
+        }
+
+        # Trocar assinatura do responsavel e do colab, pelas do modelo
+        doc.replace_pic(
+            "Imagem 21", "media/"+urlRespoAssi)
+        doc.replace_pic(
+            "Imagem 24", "media/"+urlColabAssi)
+
+        # Aplicar a troca de informações
+        doc.render(conteudo)
+
+        # Gerar um hash de
+        signer = TimestampSigner()
+        value = signer.sign(emprestimo.colaborador.nome).split(":")[-1]
+
+        nome_arquivo = f"media/termos/termo{value}.docx"
+
         try:
+            doc.save(nome_arquivo)
+
+        except Exception as e1:
+
+            print(e1)
+
+            messages.add_message(request, messages.ERROR,
+                                 "Não foi possivel gerar o termo de responsabilidade")
+            return render(request, template_name='emprestimo/editarEmprestimo.html', context=context)
+
+        termoAntigo = TermoRespo.objects.filter(
+            colaborador=emprestimo.colaborador).first()
+
+        termoAntigo.colaborador = emprestimo.colaborador
+        termoAntigo.Emprestimo = emprestimo
+        termoAntigo.url_termoRespo = nome_arquivo
+
+        try:
+            termoAntigo.save()
             equipamentoEmprestimo.save()
             emprestimo.save()
             equipamentoAntigo.save()
@@ -801,7 +921,7 @@ def editarEmprestimo(request, id):
     return render(request, template_name='emprestimo/editarEmprestimo.html', context=context)
 
 
-@login_required
+@ login_required
 def encerrarEmprestimo(request):
 
     context = {}
@@ -812,14 +932,17 @@ def encerrarEmprestimo(request):
     emp_fechado = Emprestimo.objects.filter(
         status_emprestimo='Encerrado').count()  # abertos
 
+    termosDevolucao = TermoDevo.objects.all()
+
     context['emp_aberto'] = emp_aberto
     context['emp_fechado'] = emp_fechado
     context['emprestimos'] = emprestimos
+    context['termosDevolucao'] = termosDevolucao
 
     return render(request, template_name='emprestimo/encerrarEmprestimo.html', context=context)
 
 
-@login_required
+@ login_required
 def finalizarEmprestimo(request, id):
     context = {}
     emprestimo = get_object_or_404(Emprestimo, pk=id)
@@ -829,6 +952,12 @@ def finalizarEmprestimo(request, id):
         emprestimo = get_object_or_404(Emprestimo, pk=id)
         assinaturaColaborador = request.POST.get("assinaturaColaborador")
         assinaturaResponsavel = request.POST.get("assinaturaResponsavel")
+
+        if not(assinaturaColaborador or assinaturaResponsavel):
+            messages.add_message(
+                request, messages.ERROR, 'Preencha a(as) assinaturas')
+
+            return render(request, template_name='emprestimo/finalizarEmprestimo.html', context=context)
 
         emprestimo.data_devolucao = datetime.today()
         emprestimo.data_encerramento = datetime.today()
@@ -858,7 +987,7 @@ def finalizarEmprestimo(request, id):
         emprestimo.assinatura_responsavel = urlRespoAssi
         emprestimo.assinatura_colaborador = urlColabAssi
 
-         # Importação do doc que será usado como template
+        # Importação do doc que será usado como template
         doc = DocxTemplate("media/modelo/modeloDevo.docx")
 
         locale.getlocale()
@@ -899,8 +1028,10 @@ def finalizarEmprestimo(request, id):
         }
 
         # Trocar assinatura do responsavel e do colab, pelas do modelo
-        doc.replace_pic('Imagem 10', urlColabAssi)
-        doc.replace_pic('Imagem 10', urlRespoAssi)
+        doc.replace_pic(
+            "Imagem 22", "media/"+urlRespoAssi)
+        doc.replace_pic(
+            "Imagem 19", "media/"+urlColabAssi)
 
         # Aplicar a troca de informações
         doc.render(conteudo)
@@ -932,6 +1063,7 @@ def finalizarEmprestimo(request, id):
 
             messages.add_message(request, messages.SUCCESS,
                                  'Emprestimo finalizado com sucesso')
+            return redirect('index')
         except Exception as Error:
             messages.add_message(
                 request, messages.ERROR, 'Não foi possivel finalizar o emprestimo')

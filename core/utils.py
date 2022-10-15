@@ -15,6 +15,7 @@ def retornaData(assinatura):
 def saveMedia(assinatura, identidade):
 
     local = 'media/assinaturas/'
+
     # Gerar um hash de
     signer = TimestampSigner()
     value = signer.sign(identidade).split(":")[-1]
@@ -26,4 +27,6 @@ def saveMedia(assinatura, identidade):
     img_file.write(assinatura)
     img_file.close()
 
-    return url
+    urlAlterada = url.split("/", 1)[1]
+
+    return urlAlterada

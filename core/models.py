@@ -1,3 +1,4 @@
+from distutils.command.upload import upload
 from cpf_field.models import CPFField
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
@@ -146,6 +147,7 @@ class Emprestimo(models.Model):
     assinatura_responsavel = models.ImageField(
         null=False,
         blank=False,
+
     )
 
     STATUS_EMPRESTIMO_CHOICES = (
@@ -160,6 +162,7 @@ class Emprestimo(models.Model):
         max_length=100,
         blank=False,
         null=False,
+
     )
 
 

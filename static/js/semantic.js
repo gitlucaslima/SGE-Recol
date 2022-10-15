@@ -11,6 +11,12 @@ var inputDate = document.getElementById("inputDate")
 var iconeColab = document.getElementById("iconeColab")
 var iconeRespo = document.getElementById("iconeRespo")
 var assinaturaResponsavel = document.getElementById("assinaturaResponsavel")
+var assinaturaColaborador = document.getElementById("assinaturaColaborador")
+
+console.log(assinaturaResponsavel)
+console.log(assinaturaColaborador)
+
+
 
 function carregarInput(){
     console.log(checkbox)

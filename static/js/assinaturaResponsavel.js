@@ -32,6 +32,7 @@ jQuery(document).ready(function($){
 
             //Elemento na página chamadora que será adicionado o valor da filho
             var assinaturaResponsavel = window.document.getElementById("assinaturaResponsavel");
+            console.log(assinaturaResponsavel)
             var respo = window.document.getElementById("respo");
             
             assinaturaResponsavel.value = assinatura
