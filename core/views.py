@@ -481,7 +481,6 @@ def editarEquipamento(request):
         status = request.POST.get("status")
         quantidade = request.POST.get("quantidade")
         observacao = request.POST.get("observacao")
-        print(status)
 
         equipamento_edit = Equipamento.objects.filter(id=int(id)).first()
 
@@ -559,12 +558,6 @@ def novoEmprestimo(request):
         dataDevolucao = request.POST.get("data")
         assinaturaColaborador = request.POST.get("assinaturaColaborador")
         assinaturaResponsavel = request.POST.get("assinaturaResponsavel")
-
-        if assinaturaColaborador == assinaturaResponsavel:
-            print('b.o')
-
-        print(len(assinaturaColaborador))
-        print(len(assinaturaResponsavel))
 
         if not(assinaturaColaborador or assinaturaResponsavel):
             messages.add_message(
@@ -704,6 +697,13 @@ def novoEmprestimo(request):
             messages.add_message(
                 request, messages.ERROR, 'Não foi possivel realizar o emprestimo')
 
+    context = {}
+
+    colaboradores = Colaborador.objects.all()
+    equipamentos = Equipamento.objects.filter(status="Disponivel")
+    context['colaboradores'] = colaboradores
+    context['equipamentos'] = equipamentos
+
     return render(request, template_name='emprestimo/novoEmprestimo.html', context=context)
 
 
@@ -733,15 +733,9 @@ def deletaEmprestimo(request):
 
             return redirect('index')
 
-        if os.path.exists(termoDevo.url_termoDevo.path):
-            os.rm(termoDevo.url_termoDevo)
-            print('removeu')
-
-        if os.path.exists(termoRespo.url_termoRespo.path):
-            os.rm(termoRespo.url_termoRespo)
-            print('removeu')
-
         try:
+            termoDevo.delete()
+            termoRespo.delete()
             emprestimo.delete()
             equipamentoEmprestimo.save()
             messages.add_message(request, messages.SUCCESS,
@@ -892,8 +886,6 @@ def editarEmprestimo(request, id):
 
         except Exception as e1:
 
-            print(e1)
-
             messages.add_message(request, messages.ERROR,
                                  "Não foi possivel gerar o termo de responsabilidade")
             return render(request, template_name='emprestimo/editarEmprestimo.html', context=context)
@@ -914,7 +906,6 @@ def editarEmprestimo(request, id):
             messages.add_message(request, messages.SUCCESS,
                                  'Informações alteradas com sucesso')
         except Exception as Error:
-            print(Error)
             messages.add_message(
                 request, messages.ERROR, 'Não foi possivel alterar as informações do emprestimo')
 
@@ -1046,7 +1037,6 @@ def finalizarEmprestimo(request, id):
             doc.save(nome_arquivo)
 
         except Exception as e1:
-            print(e1)
             messages.add_message(request, messages.ERROR,
                                  "Não foi possivel gerar o termo de devolução")
             return render(request, template_name='emprestimo/finalizarEmprestimo.html', context=context)
