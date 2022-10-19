@@ -1,4 +1,4 @@
-<div class="modal fade" id="modalDeletaEmprestimo{{emprestimo.id}}" aria-labelledby="modalDeletaEmprestimo{{emprestimo.id}}"
+<div class="modal fade" id="modalDeletaEmprestimoAberto{{emprestimo.id}}" aria-labelledby="modalDeletaEmprestimoAberto{{emprestimo.id}}"
     aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -9,7 +9,11 @@
             <div class="modal-body">
 
                 <span>Deseja deletar o emprestimo<strong> {{emprestimo.colaborador.nome}} </strong>?</span>
-            
+                <br>
+                <br>
+                <br>
+
+                <span>O emprestimo se encontra <strong>Aberto</strong>, assim após sua exclusão o mesmo será desfeito e o termo de devolução não será gerado.</span>
 
             </div>
             <div class="modal-footer">
@@ -17,10 +21,10 @@
                 <form action="{% url 'deletarEmprestimo' %}" method="post">
                     {% csrf_token %}
                     <input type="hidden" name="id" value="{{ emprestimo.id }}">
-                    <button type="submit" class="btn btn-success">Apagar</button>
+                    <button type="submit" class="btn btn-success">Excluir</button>
                 </form>
                 <button type="button" class="btn btn-danger" data-bs-toggle="modal"
-                    data-bs-target="#modalDeletaEmprestimo{{emprestimo.id}}" data-bs-whatever="@mdo">Cancelar
+                    data-bs-target="#modalDeletaEmprestimoAberto{{emprestimo.id}}" data-bs-whatever="@mdo">Cancelar
                 </button>
             </div>
         </div>

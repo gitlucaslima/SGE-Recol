@@ -559,7 +559,7 @@ def novoEmprestimo(request):
         assinaturaColaborador = request.POST.get("assinaturaColaborador")
         assinaturaResponsavel = request.POST.get("assinaturaResponsavel")
 
-        if not(assinaturaColaborador or assinaturaResponsavel):
+        if not(assinaturaColaborador and assinaturaResponsavel):
             messages.add_message(
                 request, messages.ERROR, 'Preencha a(as) assinaturas')
 
@@ -726,16 +726,13 @@ def deletaEmprestimo(request):
 
         termoRespo = TermoRespo.objects.filter(
             colaborador=emprestimo.colaborador).first()
-
-        if not(termoDevo):
-            messages.add_message(
-                request, messages.ERROR, 'O emprestimo ainda não foi finalizado')
-
-            return redirect('index')
-
         try:
-            termoDevo.delete()
-            termoRespo.delete()
+            if(termoDevo):
+                termoDevo.delete()
+
+            if(termoRespo):
+                termoRespo.delete()
+
             emprestimo.delete()
             equipamentoEmprestimo.save()
             messages.add_message(request, messages.SUCCESS,
@@ -944,7 +941,7 @@ def finalizarEmprestimo(request, id):
         assinaturaColaborador = request.POST.get("assinaturaColaborador")
         assinaturaResponsavel = request.POST.get("assinaturaResponsavel")
 
-        if not(assinaturaColaborador or assinaturaResponsavel):
+        if not(assinaturaColaborador and assinaturaResponsavel):
             messages.add_message(
                 request, messages.ERROR, 'Preencha a(as) assinaturas')
 

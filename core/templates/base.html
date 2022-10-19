@@ -113,7 +113,7 @@
             <main>
                 <div class="container-fluid px-4">
                     {% block tituloPagina %}
-                    <h1 class="mt-4">Dashboard</h1>
+                    <h1 class="mt-4">Painel</h1>
                     {% endblock tituloPagina %}
 
                     {% block conteudo %}
@@ -237,7 +237,7 @@
 
                                             {% if emprestimo.status_emprestimo == "Aberto" %}
                                                     {% for termoRepo in termosRepo %}
-                                                        {% if termoRepo.colaborador.nome == emprestimo.colaborador.nome %}
+                                                        {% if termoRepo.colaborador.cpf == emprestimo.colaborador.cpf %}
                                                                                                                                  
                                                             <a href="{{termoRepo.url_termoRespo}}" download="" type="button" class="btn btn-primary mt-auto btn-icon-split" download>
                                                                 <span class="icon text-white-50">
@@ -254,10 +254,10 @@
                                                 {% if emprestimo.status_emprestimo == "Encerrado" %}
                                             
                                                     {% for termoDevo in termosDevo %}
-                                                        {% if termoDevo.colaborador.nome == emprestimo.colaborador.nome  %}
+                                                        {% if termoDevo.colaborador.cpf == emprestimo.colaborador.cpf  %}
 
                                                             {% for termoRepo in termosRepo %}
-                                                                {% if termoRepo.colaborador.nome == emprestimo.colaborador.nome %}
+                                                                {% if termoRepo.colaborador.cpf == emprestimo.colaborador.cpf %}
                                                                                                                                         
                                                                     <a href="{{termoRepo.url_termoRespo}}" download="" type="button" class="btn btn-primary mt-auto btn-icon-split" download>
                                                                         <span class="icon text-white-50">
@@ -296,7 +296,21 @@
                                                         <span class="text">Editar</span>
                                                     </a>
                                             {% endif %}
-                                            
+
+
+                                            {% if emprestimo.status_emprestimo == "Aberto" %}
+
+                                                <a type="button" class="btn btn-danger"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalDeletaEmprestimoAberto{{emprestimo.id}}"
+                                                    data-bs-whatever="@mdo">
+                                                    <span class="icon text-white-50">
+                                                        <i class="fas fa-trash"></i>
+                                                    </span>
+                                                    <span class="text text-white">Excluir</span>
+                                                </a>
+
+                                            {% else %}
 
                                                 <a type="button" class="btn btn-danger"
                                                     data-bs-toggle="modal"
@@ -307,10 +321,17 @@
                                                     </span>
                                                     <span class="text text-white">Excluir</span>
                                                 </a>
+
+
+
+                                            {% endif %}
+                                            
                                         </td>
                                     </tr>
 
                                     {% include 'modais/deletarEmprestimoModal.html' %}
+                                    {% include 'modais/deletarEmprestimoAbertoModal.html' %}
+
                                     {% endfor %}
                                 </tbody>
                             </table>
