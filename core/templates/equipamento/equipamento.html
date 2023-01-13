@@ -78,7 +78,7 @@
           Equipamentos
       </div>
       <div class="card-body">
-          <table id="datatablesSimple">
+          <table class="table">
               <thead>
                   <tr>
                       <th>Nome</th>
@@ -89,16 +89,6 @@
                       <th>Ações</th>
                   </tr>
               </thead>
-              <tfoot>
-                  <tr>
-                    <th>Nome</th>
-                    <th>Numero de série</th>
-                    <th>Quantidade</th>
-                    <th>Situação</th>
-                    <th>Detalhes</th>
-                    <th>Ações</th>
-                  </tr>
-              </tfoot>
               <tbody>
                 {% for item in equipamentos %}
                 <tr>
