@@ -15,7 +15,7 @@ SECRET_KEY = 'django-insecure-0cg*%t#d=s7g4^tl&1$_$5rh0g$0up0@_604(6g+-n()$=t$)%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["https://recolemprestimo.up.railway.app/"]
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
