@@ -18,7 +18,7 @@ DEBUG = False
 CORS_ALLOW_ALL_ORIGINS = False
 
 CSRF_TRUSTED_ORIGINS = [
-    "*",
+    'https://recolemprestimo.up.railway.app/',
 ]
 
 CORS_ALLOW_METHODS = [
