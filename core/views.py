@@ -1,8 +1,8 @@
 import base64
 import datetime as dt
 import locale
-import time
 import os
+import time
 from datetime import date, datetime, timedelta
 from os import name
 
@@ -14,6 +14,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.signing import TimestampSigner
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.cache import cache_page
+from django.views.decorators.csrf import csrf_protect
 from docxtpl import DocxTemplate
 from PIL import Image
 from validate_docbr import CPF
@@ -151,6 +153,7 @@ def index(request):
     return render(request, template_name='base.html', context=context)
 
 
+@csrf_protect
 @login_required
 def cadastrarUsuario(request):
     if request.method == "GET":
