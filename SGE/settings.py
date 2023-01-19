@@ -16,7 +16,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOST = ['*']
+ALLOWED_HOST = ['https://recolemprestimo.up.railway.app/']
 
 # Application definition
 
