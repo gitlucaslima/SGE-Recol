@@ -10,6 +10,7 @@
     {% block title %}
     <title>SGE</title>
     {% endblock title %}
+    <base href="{% static '/' %}">
 
     <!--  icone -->
     <link rel="icon" href="http://gruporecol.net/v/wp-content/themes/recol/favicon.ico">
@@ -23,6 +24,7 @@
 
     <!-- Datatables -->
     <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css"/>
+    <link type="text/css" rel="stylesheet" href={% static '/css/styles.css' %}/>
 
     <!-- Jquery UI-->
     <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
@@ -31,7 +33,6 @@
     <script type="text/javascript" src={% static 'js/scripts.js' %}></script>
     <script src={% static 'js/assinaturaResponsavel.js' %}></script>
     <script src={% static 'js/assinaturaColaborador.js' %}></script>
-    <link type="text/css" rel="stylesheet" href={% static '/css/styles.css' %}/>
 
     <!--FontS-->
     <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js"></script>
